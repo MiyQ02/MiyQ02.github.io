@@ -295,6 +295,58 @@ document.addEventListener('DOMContentLoaded', syncGlobalControls);
 
 const galleryGrid = document.getElementById('gallery-grid');
 
+// ==========================================================
+// Gallery History / 手機返回鍵
+// ==========================================================
+
+const GALLERY_HISTORY_KEY = 'galleryView';
+
+// 目前頁面本身 = 作品列表
+history.replaceState(
+    {
+        ...(history.state || {}),
+        [GALLERY_HISTORY_KEY]: 'list'
+    },
+    '',
+    location.href
+);
+
+function pushGalleryHistory(view) {
+    history.pushState(
+        {
+            ...(history.state || {}),
+            [GALLERY_HISTORY_KEY]: view
+        },
+        '',
+        location.href
+    );
+}
+
+function backGalleryHistory() {
+    history.back();
+}
+
+window.addEventListener('popstate', (event) => {
+    const view = event.state?.[GALLERY_HISTORY_KEY];
+
+    if (view === 'card') {
+        // image → card
+        if (galleryIsInteractive) {
+            returnToGalleryCard();
+        }
+
+        return;
+    }
+
+    // list
+    // card → gallery list
+    if (
+        galleryModal.getAttribute('aria-hidden') === 'false'
+    ) {
+        closeGalleryLightbox();
+    }
+});
+
 function createWorks(start, end, year) {
     return Array.from(
         { length: end - start + 1 },
@@ -2405,12 +2457,21 @@ function returnToGalleryCard() {
 }
 
 function enableGalleryInteraction() {
+
+    if (galleryIsInteractive) {
+        return;
+    }
+
     galleryIsInteractive = true;
     galleryInfo.hidden = true;
+
     galleryModal.classList.add('is-interactive');
     galleryModal.classList.add('zoom-active');
 
     updateGalleryTransform();
+
+    // card → image
+    pushGalleryHistory('image');
 }
 
 // 使用事件委派，讓 JavaScript 動態建立的作品卡片也能開啟燈箱。
@@ -2422,13 +2483,22 @@ galleryGrid.addEventListener('click', (event) => {
     }
 
     openGalleryLightbox(item);
+
+    // list → card
+    pushGalleryHistory('card');
 });
 
 galleryCloseButton.addEventListener('click', (event) => {
     event.stopPropagation();
-    returnToGalleryCard();
-});
 
+    if (galleryIsInteractive) {
+        // image → card
+        history.back();
+    } else {
+        // card → list
+        history.back();
+    }
+});
 const galleryPanel = galleryModal.querySelector('.gallery-lightbox-panel');
 
 galleryModal.addEventListener('click', (event) => {
@@ -2438,22 +2508,32 @@ galleryModal.addEventListener('click', (event) => {
 
     if (galleryIsInteractive) {
 
+        // 圖片放大狀態：
+        // 點圖片以外 → 回到卡片
         if (!clickedOnImage) {
-            returnToGalleryCard();
+            history.back();
         }
 
     } else {
 
         if (clickedOnImage) {
+
+            // 卡片 → 圖片放大
             enableGalleryInteraction();
 
-        } else if (event.target.closest('.close-btn')) {
-            returnToGalleryCard();
+        } else if (
+            event.target === galleryCloseButton ||
+            event.target.closest('.close-btn')
+        ) {
 
-        } else if (!clickedInsidePanel) {
-            closeGalleryLightbox();
+            // 卡片 → 列表
+            history.back();
+
+        } else {
+
+            // 點卡片外背景 → 列表
+            history.back();
         }
-
     }
 });
 

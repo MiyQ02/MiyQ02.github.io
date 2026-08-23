@@ -313,16 +313,49 @@ function getTouchCenter(firstTouch, secondTouch) {
     };
 }
 
+// ==========================================================
+// 首頁圖片 Lightbox 的手機返回鍵 History
+// ==========================================================
+
+const INDEX_LIGHTBOX_HISTORY_KEY = 'indexLightbox';
+
+history.replaceState(
+    {
+        ...(history.state || {}),
+        [INDEX_LIGHTBOX_HISTORY_KEY]: 'page'
+    },
+    '',
+    location.href
+);
+
+function pushIndexLightboxHistory() {
+    history.pushState(
+        {
+            ...(history.state || {}),
+            [INDEX_LIGHTBOX_HISTORY_KEY]: 'lightbox'
+        },
+        '',
+        location.href
+    );
+}
+
 function openLightbox() {
     const fullSrc = triggerImage.dataset.fullSrc;
+
     lightboxImage.src = fullSrc || triggerImage.src;
     lightboxImage.alt = triggerImage.alt;
+
     scale = 1;
     offsetX = 0;
     offsetY = 0;
+
     updateImageTransform();
+
     lightboxModal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
+
+    // 首頁 → 圖片查看器
+    pushIndexLightboxHistory();
 }
 
 function closeLightbox() {
@@ -333,10 +366,37 @@ function closeLightbox() {
 }
 
 triggerImage?.addEventListener('click', openLightbox);
-closeButton?.addEventListener('click', closeLightbox);
+closeButton?.addEventListener('click', () => {
+    history.back();
+});
+
+// ==========================================================
+// 手機瀏覽器返回鍵
+// ==========================================================
+
+window.addEventListener('popstate', (event) => {
+    const view = event.state?.[INDEX_LIGHTBOX_HISTORY_KEY];
+
+    if (view === 'page') {
+        // Lightbox → 首頁
+        if (lightboxModal?.style.display === 'flex') {
+            closeLightbox();
+        }
+
+        return;
+    }
+
+    // 沒有我們建立的 state 時，
+    // 如果 Lightbox 還開著，也把它關掉。
+    if (lightboxModal?.style.display === 'flex') {
+        closeLightbox();
+    }
+});
 
 lightboxModal?.addEventListener('click', (event) => {
-    if (event.target === lightboxModal) closeLightbox();
+    if (event.target === lightboxModal) {
+        history.back();
+    }
 });
 
 lightboxModal?.addEventListener('wheel', (event) => {
