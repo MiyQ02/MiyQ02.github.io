@@ -45,19 +45,15 @@
     
 <script>
 (function () {
-    const isMobilePage = location.pathname.split('/').pop().endsWith('_mobile.html');
-    let currentName = location.pathname.split('/').pop();
-
-    // 【核心修正】如果進來的是根目錄網址，預設名稱就是 index.html
-    if (currentName === "" || currentName === "/") {
-        currentName = "gallery.html";
-    }
+    const currentName = location.pathname.split('/').pop() || 'gallery.html';
+    const isMobilePage = currentName.endsWith('_mobile.html');
 
     const desktopToMobile = {
         'index.html': 'index_mobile.html',
         'gallery.html': 'gallery_mobile.html',
         'about.html': 'about_mobile.html'
     };
+
     const mobileToDesktop = {
         'index_mobile.html': 'index.html',
         'gallery_mobile.html': 'gallery.html',
@@ -65,7 +61,9 @@
     };
 
     function syncPageByViewport() {
-        const isMobileViewport = window.matchMedia('(max-width: 760px)').matches;
+        const isMobileViewport =
+            window.matchMedia('(max-width: 760px)').matches;
+
         const target = isMobileViewport
             ? desktopToMobile[currentName]
             : mobileToDesktop[currentName];
@@ -78,6 +76,7 @@
     syncPageByViewport();
 
     const mediaQuery = window.matchMedia('(max-width: 760px)');
+
     if (mediaQuery.addEventListener) {
         mediaQuery.addEventListener('change', syncPageByViewport);
     } else {
