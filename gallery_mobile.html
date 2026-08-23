@@ -300,21 +300,21 @@ const galleryGrid = document.getElementById('gallery-grid');
 // ==========================================================
 
 const GALLERY_HISTORY_KEY = 'galleryView';
+const GALLERY_PAGE_KEY = 'galleryPage';
 
-// 目前頁面本身 = 作品列表
-history.replaceState(
-    {
-        ...(history.state || {}),
-        [GALLERY_HISTORY_KEY]: 'list'
-    },
-    '',
-    location.href
-);
-
-function pushGalleryHistory(view) {
-    history.pushState(
+/*
+ * Gallery 的 History 狀態只有三種：
+ * list  → 作品列表
+ * card  → 作品資訊卡
+ * image → 原圖查看
+ *
+ * 注意：首頁等其他頁面沒有 galleryPage，因此不能把「沒有 state」誤判成 list。
+ */
+function replaceGalleryHistory(view) {
+    history.replaceState(
         {
             ...(history.state || {}),
+            [GALLERY_PAGE_KEY]: true,
             [GALLERY_HISTORY_KEY]: view
         },
         '',
@@ -322,28 +322,55 @@ function pushGalleryHistory(view) {
     );
 }
 
-function backGalleryHistory() {
-    history.back();
+function pushGalleryHistory(view) {
+    history.pushState(
+        {
+            ...(history.state || {}),
+            [GALLERY_PAGE_KEY]: true,
+            [GALLERY_HISTORY_KEY]: view
+        },
+        '',
+        location.href
+    );
 }
 
+// 目前頁面本身就是 Gallery 的列表狀態。
+replaceGalleryHistory('list');
+
 window.addEventListener('popstate', (event) => {
-    const view = event.state?.[GALLERY_HISTORY_KEY];
+    const state = event.state || {};
 
-    if (view === 'card') {
-        // image → card
-        if (galleryIsInteractive) {
-            returnToGalleryCard();
-        }
-
+    // 已經離開 Gallery（例如回到首頁），不要把它誤判成 list。
+    if (state[GALLERY_PAGE_KEY] !== true) {
         return;
     }
 
-    // list
-    // card → gallery list
-    if (
-        galleryModal.getAttribute('aria-hidden') === 'false'
-    ) {
-        closeGalleryLightbox();
+    const view = state[GALLERY_HISTORY_KEY];
+
+    if (view === 'image') {
+        // 支援瀏覽器前進：card → image
+        if (galleryModal.getAttribute('aria-hidden') === 'false') {
+            galleryIsInteractive = true;
+            galleryInfo.hidden = true;
+            galleryModal.classList.add('is-interactive', 'zoom-active');
+            updateGalleryTransform();
+        }
+        return;
+    }
+
+    if (view === 'card') {
+        // image → card
+        if (galleryModal.getAttribute('aria-hidden') === 'false') {
+            returnToGalleryCard();
+        }
+        return;
+    }
+
+    if (view === 'list') {
+        // card → list
+        if (galleryModal.getAttribute('aria-hidden') === 'false') {
+            closeGalleryLightbox();
+        }
     }
 });
 
@@ -2656,11 +2683,8 @@ document.addEventListener('keydown', (event) => {
         event.key === 'Escape' &&
         galleryModal.style.display === 'flex'
     ) {
-        if (galleryIsInteractive) {
-            returnToGalleryCard();
-        } else {
-            closeGalleryLightbox();
-        }
+        // ESC 與手機返回鍵使用完全相同的 History 機制，避免畫面與 History 不同步。
+        history.back();
     }
 });
 
