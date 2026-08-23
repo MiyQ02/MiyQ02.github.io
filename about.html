@@ -46,7 +46,12 @@
 <script>
 (function () {
     const isMobilePage = location.pathname.split('/').pop().endsWith('_mobile.html');
-    const currentName = location.pathname.split('/').pop();
+    let currentName = location.pathname.split('/').pop();
+
+    // 【核心修正】如果進來的是根目錄網址，預設名稱就是 index.html
+    if (currentName === "" || currentName === "/") {
+        currentName = "about.html";
+    }
 
     const desktopToMobile = {
         'index.html': 'index_mobile.html',
