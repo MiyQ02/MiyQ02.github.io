@@ -1,0 +1,2646 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title data-i18n="title">滅Q - 繪畫</title>
+    
+    <style>
+        html.language-loading body {
+            visibility: hidden;
+        }
+    </style>
+
+    <script>
+    (function () {
+        const lang = localStorage.getItem('lang');
+
+        if (lang === 'en' || lang === 'ja') {
+            document.documentElement.classList.add('language-loading');
+        }
+    })();
+    </script>
+
+    <!-- 鎖定防閃爍（Anti-Flicker）的內聯腳本，在所有上伸的資源加載前執行 -->
+    <script>
+        (function() {
+            // 優先啟取 localStorage 的主題設定，次之依賴系統偏好
+            let themeClass = localStorage.getItem('theme');
+            
+            if (!themeClass) {
+                // 偵測系統偏好，但不隸記存
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                themeClass = prefersDark ? 'dark-theme' : 'light-theme';
+            } else {
+                // localStorage 中存的是 'dark' 或 'light'，需要轉換為 class 名
+                themeClass = themeClass === 'dark' ? 'dark-theme' : 'light-theme';
+            }
+            
+            // 立即應用到 <html> 元素，在瀏覽器上設之前完成
+            document.documentElement.classList.add(themeClass);
+        })();
+    </script>
+    
+<script>
+(function () {
+    const isMobilePage = location.pathname.split('/').pop().endsWith('_mobile.html');
+    const currentName = location.pathname.split('/').pop();
+
+    const desktopToMobile = {
+        'index.html': 'index_mobile.html',
+        'gallery.html': 'gallery_mobile.html',
+        'about.html': 'about_mobile.html'
+    };
+    const mobileToDesktop = {
+        'index_mobile.html': 'index.html',
+        'gallery_mobile.html': 'gallery.html',
+        'about_mobile.html': 'about.html'
+    };
+
+    function syncPageByViewport() {
+        const isMobileViewport = window.matchMedia('(max-width: 760px)').matches;
+        const target = isMobileViewport
+            ? desktopToMobile[currentName]
+            : mobileToDesktop[currentName];
+
+        if (target && (isMobileViewport !== isMobilePage)) {
+            location.replace(target);
+        }
+    }
+
+    syncPageByViewport();
+
+    const mediaQuery = window.matchMedia('(max-width: 760px)');
+    if (mediaQuery.addEventListener) {
+        mediaQuery.addEventListener('change', syncPageByViewport);
+    } else {
+        mediaQuery.addListener(syncPageByViewport);
+    }
+})();
+</script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="mobile-gallery-page mobile-site-page">
+
+    <header class="navbar mobile-navbar">
+        <nav>
+            <button id="mobile-menu-toggle" class="mobile-menu-toggle" type="button" aria-label="開啟選單" aria-expanded="false">
+                <span class="hamburger-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+                <span data-i18n="mobile-menu">選單</span>
+            </button>
+
+            <div class="nav-controls" aria-label="語言與主題設定">
+                <div class="lang-select-wrap">
+                    <select id="lang-select" aria-label="語言切換">
+                        <option value="zh-TW">中文（台灣）</option>
+                        <option value="en">English</option>
+                        <option value="ja">日本語</option>
+                    </select>
+                </div>
+                <button id="theme-toggle" type="button" aria-label="切換黑夜模式">🌙</button>
+            </div>
+        </nav>
+    </header>
+
+    <div id="mobile-drawer-overlay" class="mobile-drawer-overlay" hidden></div>
+
+    <aside id="mobile-menu-drawer" class="mobile-drawer" aria-hidden="true">
+        <div class="mobile-drawer-header">
+            <h2 data-i18n="mobile-menu">選單</h2>
+            <button class="mobile-drawer-close" id="mobile-menu-close" type="button" aria-label="關閉選單">&times;</button>
+        </div>
+        <nav class="mobile-drawer-links" aria-label="手機版導覽">
+            <a href="index_mobile.html" class="mobile-drawer-link" data-i18n="nav-home">首頁</a>
+            <a href="gallery_mobile.html" class="mobile-drawer-link active" data-i18n="nav-gallery">繪畫</a>
+            <a href="about_mobile.html" class="mobile-drawer-link" data-i18n="nav-about">關於</a>
+        </nav>
+    </aside>
+
+    <aside id="year-settings-drawer" class="mobile-drawer year-settings-drawer" aria-hidden="true">
+        <div class="mobile-drawer-header">
+            <h2 data-i18n="gallery-years">年份</h2>
+            <button class="mobile-drawer-close" id="year-settings-close" type="button" aria-label="關閉年份設定">&times;</button>
+        </div>
+        <div id="mobile-year-filters" class="year-filters mobile-year-filters"></div>
+    </aside>
+
+    <main class="content-container gallery-container mobile-gallery-container">
+        <button id="year-settings-toggle" class="year-settings-toggle" type="button" aria-label="開啟年份篩選" aria-expanded="false">⚙</button>
+        <section class="gallery-grid" id="gallery-grid" aria-label="作品集"></section>
+
+        <div id="gallery-lightbox" class="lightbox gallery-lightbox" aria-hidden="true">
+            <button class="close-btn" type="button" aria-label="返回作品資訊">&times;</button>
+            <div class="gallery-lightbox-panel">
+                <div class="lightbox-content-wrapper" id="gallery-img-wrapper">
+                    <img id="gallery-lightbox-img" src="" alt="">
+                </div>
+                <div class="gallery-work-info" id="gallery-work-info">
+                    <h2 id="gallery-work-title"></h2>
+                    <p id="gallery-work-description"></p>
+                    <time id="gallery-work-date"></time>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+
+<script>
+const themeToggle = document.getElementById('theme-toggle');
+const langSelect = document.getElementById('lang-select');
+const themeButtons = [themeToggle].filter(Boolean);
+const languageSelects = [langSelect].filter(Boolean);
+
+const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+const mobileMenuDrawer = document.getElementById('mobile-menu-drawer');
+const mobileMenuClose = document.getElementById('mobile-menu-close');
+const yearSettingsToggle = document.getElementById('year-settings-toggle');
+const yearSettingsDrawer = document.getElementById('year-settings-drawer');
+const yearSettingsClose = document.getElementById('year-settings-close');
+const mobileDrawerOverlay = document.getElementById('mobile-drawer-overlay');
+
+function closeMobileDrawers() {
+    [mobileMenuDrawer, yearSettingsDrawer].forEach((drawer) => {
+        if (!drawer) return;
+        drawer.classList.remove('is-open');
+        drawer.setAttribute('aria-hidden', 'true');
+    });
+    [mobileMenuToggle, yearSettingsToggle].forEach((button) => {
+        if (button) button.setAttribute('aria-expanded', 'false');
+    });
+    if (mobileDrawerOverlay) mobileDrawerOverlay.hidden = true;
+    document.body.classList.remove('drawer-open');
+}
+
+function openMobileDrawer(drawer, trigger) {
+    if (!drawer || !trigger) return;
+    closeMobileDrawers();
+    drawer.classList.add('is-open');
+    drawer.setAttribute('aria-hidden', 'false');
+    trigger.setAttribute('aria-expanded', 'true');
+    mobileDrawerOverlay.hidden = false;
+    document.body.classList.add('drawer-open');
+}
+
+mobileMenuToggle.addEventListener('click', () => openMobileDrawer(mobileMenuDrawer, mobileMenuToggle));
+mobileMenuClose.addEventListener('click', closeMobileDrawers);
+yearSettingsToggle.addEventListener('click', () => openMobileDrawer(yearSettingsDrawer, yearSettingsToggle));
+yearSettingsClose.addEventListener('click', closeMobileDrawers);
+mobileDrawerOverlay.addEventListener('click', closeMobileDrawers);
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeMobileDrawers();
+});
+
+function applyStoredTheme(themeName) {
+    const isDark = themeName === 'dark';
+    const themeClass = isDark ? 'dark-theme' : 'light-theme';
+    
+    // 在 html 元素上設置主題（防閃爍）
+    document.documentElement.classList.remove('light-theme', 'dark-theme');
+    document.documentElement.classList.add(themeClass);
+    
+    // 相容性：也在 body 上設置
+    document.body.classList.toggle('dark-theme', isDark);
+    
+    themeButtons.forEach((button) => {
+        button.textContent = isDark ? '☀️' : '🌙';
+        button.setAttribute('aria-label', isDark ? '切換為白天模式' : '切換為黑夜模式');
+    });
+}
+
+function applyStoredLanguage(languageCode) {
+    const normalized = ['en', 'ja'].includes(languageCode) ? languageCode : 'zh-TW';
+    const selectedFlag = normalized === 'en' ? './img/other/USA.svg' : normalized === 'ja' ? './img/other/JP.svg' : './img/other/TW.svg';
+
+    document.documentElement.style.setProperty('--lang-flag-url', `url("${selectedFlag}")`);
+
+    languageSelects.forEach((select) => {
+        if (select) {
+            select.value = normalized;
+        }
+    });
+    // 更新頁面內容文字
+    if (typeof updatePageLanguage === 'function') {
+        updatePageLanguage(normalized);
+    }
+}
+
+function syncGlobalControls() {
+    try {
+        let savedTheme = localStorage.getItem('theme');
+        
+        // 如果沒有儲存過主題，則根據系統偏好自動設定
+        if (!savedTheme) {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            savedTheme = prefersDark ? 'dark' : 'light';
+        }
+        
+        const savedLanguage = localStorage.getItem('lang') || 'zh-TW';
+        applyStoredTheme(savedTheme);
+        applyStoredLanguage(savedLanguage);
+    } catch (error) {
+        applyStoredTheme('light');
+        applyStoredLanguage('zh-TW');
+    }
+}
+
+themeButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+        const nextTheme = document.documentElement.classList.contains('dark-theme') ? 'light' : 'dark';
+        try {
+            localStorage.setItem('theme', nextTheme);
+        } catch (error) {
+            // 忽略儲存失敗，保留前端預設值。
+        }
+        applyStoredTheme(nextTheme);
+    });
+});
+
+languageSelects.forEach((select) => {
+    select.addEventListener('change', (event) => {
+        const nextLanguage = ['en', 'ja'].includes(event.target.value) ? event.target.value : 'zh-TW';
+        try {
+            localStorage.setItem('lang', nextLanguage);
+        } catch (error) {
+            // 忽略儲存失敗，保留前端預設值。
+        }
+        applyStoredLanguage(nextLanguage);
+    });
+});
+
+document.addEventListener('DOMContentLoaded', syncGlobalControls);
+
+/*
+ * ==========================================================
+ * 作品資料與自動排序
+ * ----------------------------------------------------------
+ * 年份分流：
+ * 2026：128 ~ 139
+ * 2025：100 ~ 127
+ * 2024：71 ~ 99
+ * 2023：18 ~ 70
+ * 2022：1 ~ 17
+ *
+ * 特殊作品：
+ * 2026：130-2.png
+ * 2024：79-2.jpg
+ *
+ * 圖片副檔名不固定，因此會依序嘗試 .jpg 與 .png。
+ * 排序只依「檔名」判斷，不讀取檔案修改日期。
+ * ==========================================================
+ */
+
+const galleryGrid = document.getElementById('gallery-grid');
+
+function createWorks(start, end, year) {
+    return Array.from(
+        { length: end - start + 1 },
+        (_, index) => ({
+            filename: String(start + index),
+            year: String(year)
+        })
+    );
+}
+
+// 建立各年份作品資料。
+const works = [
+    ...createWorks(128, 139, 2026),
+    { filename: '128-2', year: '2026', extension: '.png' },
+    { filename: '130-2', year: '2026', extension: '.png' },
+
+    ...createWorks(100, 127, 2025),
+
+    ...createWorks(71, 99, 2024),
+    { filename: '79-2', year: '2024', extension: '.jpg' },
+
+    ...createWorks(18, 70, 2023),
+    ...createWorks(1, 17, 2022)
+];
+
+/*
+ * 自然排序：檔名由大到小。
+ *
+ * 例如：
+ * 139 → 138 → ... → 130 → 130-2 → 129
+ * ... → 80 → 79 → 79-2 → 78 → ... → 1
+ *
+ * 第一層先比較檔名中的主數字；主數字相同時，再使用
+ * localeCompare + numeric:true 比較完整檔名，確保排序規則
+ * 不依賴電腦檔案的修改日期。
+ */
+function naturalDescendingCompare(a, b) {
+    const baseA = Number.parseInt(a.filename.split('-')[0], 10);
+    const baseB = Number.parseInt(b.filename.split('-')[0], 10);
+
+    if (baseA !== baseB) {
+        return baseB - baseA;
+    }
+
+    // 同一主編號時：純數字作品排在差分/連作之後的需求，
+    // 例如 130 → 130-2、79 → 79-2。
+    const isPlainA = /^\d+$/.test(a.filename);
+    const isPlainB = /^\d+$/.test(b.filename);
+
+    if (isPlainA !== isPlainB) {
+        return isPlainA ? -1 : 1;
+    }
+
+    return b.filename.localeCompare(
+        a.filename,
+        undefined,
+        {
+            numeric: true,
+            sensitivity: 'base'
+        }
+    );
+}
+
+works.sort(naturalDescendingCompare);
+
+/*
+ * ==========================================================
+ * 作品標題與簡介：每一件作品都可以在這裡單獨修改
+ * ----------------------------------------------------------
+ * 格式：
+ *
+ * '檔名': {
+ *     title: '作品標題',
+ *     description: '作品簡介'
+ * }
+ *
+ * 每個作品都有自己的 title / description，可以直接填寫。
+ * title 留空時會自動使用檔名；description 留空時會顯示
+ * 「尚未填寫作品簡介」。
+ *
+ * 注意：
+ * date（年份）不在這裡修改，仍然由作品的 year 自動決定。
+ * ==========================================================
+ */
+const galleryWorkInfoData = {
+    "zh-TW": {
+        // ===== 2026 =====
+        "139": {
+            "title": "千都和尤莉的後室旅行",
+            "description": "在後室中旅行，因為遇到怪物而逃跑"
+        },
+        "138": {
+            "title": "NYN姉貴在看電視",
+            "description": "你可以在想要表達「我只是來看戲的」或任何其他情境時，隨時使用這個貼圖"
+        },
+        "137": {
+            "title": "尤莉餓到把自己的槍吃了",
+            "description": "突然想到，於是就畫了"
+        },
+        "136": {
+            "title": "親親",
+            "description": "我因為克制住自己的慾望，才畫出這張圖"
+        },
+        "135": {
+            "title": "忘記我",
+            "description": "在推特上看到一張圖，我覺得很有趣，於是就畫了類似的圖"
+        },
+        "134": {
+            "title": "【03】兼任 MagicalDraw",
+            "description": "那段時間正在看命運石之門，因為我很喜歡牧瀨紅莉栖這個角色，就把她畫在後面"
+        },
+        "133": {
+            "title": "【蘑菇的擬態日常】山下真面目游標",
+            "description": "山下真面目游標"
+        },
+        "132": {
+            "title": "【蘑菇的擬態日常】月島靜寂游標",
+            "description": "月島靜寂游標，這應該我目前做的最滿意的游標了"
+        },
+        "131": {
+            "title": "Portrait in Pastel",
+            "description": "茂川老師和墨田學姊，兩位都有藝術細胞，天生一對（？）"
+        },
+        "130": {
+            "title": "【02】Atonement of the Egoist",
+            "description": "差分"
+        },
+        "129": {
+            "title": "Shimeji Simulation",
+            "description": "我很喜歡音遊的曲繪，於是就試著模仿"
+        },
+        "128": {
+            "title": "【02】少女終末旅行電腦桌布",
+            "description": "差分"
+        },
+        "128-2": {
+            "title": "少女終末旅行電腦桌布",
+            "description": "這是我目前畫的最滿意的一張圖，可以拿來當電腦桌布，並且在這當中使用了提供免費素材的網站的照片和我拍的照片，以及一些紋理"        
+        },
+        "130-2": {
+            "title": "Atonement of the Egoist",
+            "description": "那時候想到漫畫後半段的劇情，於是就畫了出來"
+        },
+        // ===== 2025 =====
+        "127": {
+            "title": "【22】筆記本塗鴉",
+            "description": "我還蠻喜歡初音的"
+        },
+        "126": {
+            "title": "尤莉的怪表情",
+            "description": "我還蠻喜歡這個表情的"
+        },
+        "125": {
+            "title": "【21】筆記本塗鴉",
+            "description": "我不會畫狗"
+        },
+        "124": {
+            "title": "小時候/長大後",
+            "description": " "
+        },
+        "123": {
+            "title": "祥子消失",
+            "description": "我喜歡這個迷因，有做成gif放到Tenor上，用關鍵字就會跑出來"
+        },
+        "122": {
+            "title": "躺在雪地上",
+            "description": "做了一個手機桌布，但老實說不太滿意"
+        },
+        "121": {
+            "title": "我就爛",
+            "description": "Mortis：「我全都不會彈喔」"
+        },
+        "120": {
+            "title": "【少女終末旅行】千都游標",
+            "description": "千都游標"
+        },
+        "119": {
+            "title": "【02】MGR姉貴",
+            "description": "有些地方畫錯了"
+        },
+        "118": {
+            "title": "Obscura Lunae",
+            "description": "我喜歡Ave Mujica，這張圖裡的角色的服裝，是我畫過最複雜的，需要角色3D輔助，以及別人畫的圖和官方的圖來參考，構圖的部分有看了許多音遊曲繪，讓我有了靈感"
+        },
+        "117": {
+            "title": "尹曉風",
+            "description": "她和他和她的澎湖灣的男主角，我絕對不是因為他很可愛才畫他的"
+        },
+        "116": {
+            "title": "小紅帽",
+            "description": "之前有一段時間沉迷於BLACK SOULS，就畫了出來，在這其中用了6張照片，全都來自免費提供照片素材的網站"
+        },
+        "115": {
+            "title": "【少女終末旅行】尤莉游標",
+            "description": "尤莉游標，那段時間其實多少有在觀察網路上關於少女終末旅行的同人創作，因為發現從來沒有人做完整的游標（？），於是我就做了"
+        },
+        "114": {
+            "title": "【02】兼任 MagicalDraw",
+            "description": "兼任可愛"
+        },
+        "113": {
+            "title": "存檔點",
+            "description": "休息一下"
+        },
+        "112": {
+            "title": "【02】在會計學課本上畫畫",
+            "description": "隨便畫的"
+        },
+        "111": {
+            "title": "【20】筆記本塗鴉",
+            "description": "畫了一個凱爾希，俯視角度難畫"
+        },
+        "110": {
+            "title": "在會計學課本上畫畫",
+            "description": "上課很無聊，就畫了這個"
+        },
+        "109": {
+            "title": "【19】筆記本塗鴉",
+            "description": "Arcaea裡的角色，突然有靈感時畫的"
+        },
+        "108": {
+            "title": "【02】在經濟學課本上亂畫",
+            "description": "我不知道我在畫什麼"
+        },
+        "107": {
+            "title": "【18】筆記本塗鴉",
+            "description": "初音"
+        },
+        "106": {
+            "title": "【17】筆記本塗鴉",
+            "description": "初音"
+        },
+        "105": {
+            "title": "【02】練習",
+            "description": "那時有一段時間沒畫畫，所以就練了一下"
+        },
+        "104": {
+            "title": "RPG Maker MV",
+            "description": "人物"
+        },
+        "103": {
+            "title": "在A4紙上畫畫",
+            "description": "突如其來的靈感讓我畫了這張圖"
+        },
+        "102": {
+            "title": "兼任 MagicalDraw",
+            "description": "兼任真的可愛，所以就畫了"
+        },
+        "101": {
+            "title": "若葉睦想著黃瓜",
+            "description": "忘了是什麼原因讓我畫這張圖"
+        },
+        "100": {
+            "title": "【16】筆記本塗鴉",
+            "description": "Ave Mujica動畫播出幾天後，就畫了這張圖"
+        },
+        // ===== 2024 =====
+        "99": {
+            "title": "Discord 群組繪畫OC交換活動",
+            "description": "畫這張圖的時候參考了兩張圖，一張是背景另一張是樹枝，我蠻喜歡那個人的原創角色"
+        },
+        "98": {
+            "title": "【15】筆記本塗鴉",
+            "description": "惡魔曉美焰的能力雖然很強，但其實我比較喜歡的是原來的曉美焰，因為我真的很喜歡時間暫停"
+        },
+        "97": {
+            "title": "在經濟學課本上亂畫",
+            "description": "蠻喜歡這張構圖的"
+        },
+        "96": {
+            "title": "【14】筆記本塗鴉",
+            "description": "畫了Drugsneko筆下的角色，因為可愛就畫了"
+        },
+        "95": {
+            "title": "【13】筆記本塗鴉",
+            "description": " "
+        },
+        "94": {
+            "title": "【12】筆記本塗鴉",
+            "description": " "
+        },
+        "93": {
+            "title": "【11】筆記本塗鴉",
+            "description": " "
+        },
+        "92": {
+            "title": "【10】筆記本塗鴉",
+            "description": " "
+        },
+        "91": {
+            "title": "失溫症",
+            "description": "原本要畫完的，但我不忍心，所以放棄了"
+        },
+        "90": {
+            "title": "🌕",
+            "description": "月光的魔力"
+        },
+        "89": {
+            "title": "【09】筆記本塗鴉",
+            "description": "艾麗妮"
+        },
+        "88": {
+            "title": "初音的服裝",
+            "description": "原本要畫一個同人漫畫，最後沒有完成"
+        },
+        "87": {
+            "title": "凱爾希",
+            "description": "我喜歡凱爾希"
+        },
+        "86": {
+            "title": "MGR姉貴",
+            "description": "跟Discord的朋友聊天時，我臨時起意就畫了這張圖，我想也就是在這時候喜歡上クッキー☆的種子在我內心埋下了"
+        },
+        "85": {
+            "title": "【03】生日快樂",
+            "description": "Drugsneko的生日，所以我畫了"
+        },
+        "84": {
+            "title": "抱著書的千都",
+            "description": " "
+        },
+        "83": {
+            "title": "練手感",
+            "description": "有些時候會畫我的人物形象"
+        },
+        "82": {
+            "title": "【02】生日快樂",
+            "description": "兼任的生日，所以我畫了"
+        },
+        "81": {
+            "title": "摸著石像的尤莉",
+            "description": " "
+        },
+        "80": {
+            "title": "凱爾希拿魔爪",
+            "description": "我記得這段時間很喜歡RaV²的畫，於是就模仿了他的風格一段時間，雖然不知道為什麼他把Pixiv上的圖都刪了，挺可惜的"
+        },
+        "79": {
+            "title": "【02】腦子裡突然出現初音的樣子",
+            "description": "重新上色"
+        },
+        "78": {
+            "title": "生日快樂",
+            "description": "MAFU的生日，所以我畫了"
+        },
+        "77": {
+            "title": "畫Drugsneko",
+            "description": "四頭身好難畫，我不會畫"
+        },
+        "76": {
+            "title": "在小畫家上畫畫",
+            "description": "畫了一個在2024年蠻喜歡的一個角色"
+        },
+        "75": {
+            "title": "突然有靈感而畫的",
+            "description": "原本是要上色，但因為擱置太久就沒想上色了"
+        },
+        "74": {
+            "title": "【08】筆記本塗鴉",
+            "description": "看了太多つくみず畫的東西，而畫了這個"
+        },
+        "73": {
+            "title": "【07】筆記本塗鴉",
+            "description": "我很確定我在pinterest上有看過相關的姿勢"
+        },
+        "72": {
+            "title": "練習",
+            "description": "原本挺喜歡玩這遊戲的，但因為被噁心到受不了就沒玩了"
+        },
+        "71": {
+            "title": "【06】筆記本塗鴉",
+            "description": "看了蘑菇的擬態日常而畫的圖，漫畫裡面的分鏡跟畫面我很喜歡"
+        },
+        "79-2": {
+            "title": "腦子裡突然出現初音的樣子",
+            "description": "我記得那時後很喜歡なお畫的圖"
+        },
+        // ===== 2023 =====
+        "70": {
+            "title": "【05】筆記本塗鴉",
+            "description": ""
+        },
+        "69": {
+            "title": "",
+            "description": ""
+        },
+        "68": {
+            "title": "【04】筆記本塗鴉",
+            "description": ""
+        },
+        "67": {
+            "title": "",
+            "description": ""
+        },
+        "66": {
+            "title": "",
+            "description": ""
+        },
+        "65": {
+            "title": "",
+            "description": ""
+        },
+        "64": {
+            "title": "",
+            "description": ""
+        },
+        "63": {
+            "title": "",
+            "description": ""
+        },
+        "62": {
+            "title": "",
+            "description": ""
+        },
+        "61": {
+            "title": "",
+            "description": ""
+        },
+        "60": {
+            "title": "",
+            "description": ""
+        },
+        "59": {
+            "title": "",
+            "description": ""
+        },
+        "58": {
+            "title": "",
+            "description": ""
+        },
+        "57": {
+            "title": "",
+            "description": ""
+        },
+        "56": {
+            "title": "【03】筆記本塗鴉",
+            "description": ""
+        },
+        "55": {
+            "title": "【02】筆記本塗鴉",
+            "description": ""
+        },
+        "54": {
+            "title": "",
+            "description": ""
+        },
+        "53": {
+            "title": "",
+            "description": ""
+        },
+        "52": {
+            "title": "",
+            "description": ""
+        },
+        "51": {
+            "title": "",
+            "description": ""
+        },
+        "50": {
+            "title": "",
+            "description": ""
+        },
+        "49": {
+            "title": "",
+            "description": ""
+        },
+        "48": {
+            "title": "",
+            "description": ""
+        },
+        "47": {
+            "title": "",
+            "description": ""
+        },
+        "46": {
+            "title": "",
+            "description": ""
+        },
+        "45": {
+            "title": "",
+            "description": ""
+        },
+        "44": {
+            "title": "",
+            "description": ""
+        },
+        "43": {
+            "title": "筆記本塗鴉",
+            "description": ""
+        },
+        "42": {
+            "title": "",
+            "description": ""
+        },
+        "41": {
+            "title": "",
+            "description": ""
+        },
+        "40": {
+            "title": "",
+            "description": ""
+        },
+        "39": {
+            "title": "",
+            "description": ""
+        },
+        "38": {
+            "title": "",
+            "description": ""
+        },
+        "37": {
+            "title": "",
+            "description": ""
+        },
+        "36": {
+            "title": "",
+            "description": ""
+        },
+        "35": {
+            "title": "",
+            "description": ""
+        },
+        "34": {
+            "title": "",
+            "description": ""
+        },
+        "33": {
+            "title": "",
+            "description": ""
+        },
+        "32": {
+            "title": "",
+            "description": ""
+        },
+        "31": {
+            "title": "",
+            "description": ""
+        },
+        "30": {
+            "title": "",
+            "description": ""
+        },
+        "29": {
+            "title": "",
+            "description": ""
+        },
+        "28": {
+            "title": "",
+            "description": ""
+        },
+        "27": {
+            "title": "",
+            "description": ""
+        },
+        "26": {
+            "title": "",
+            "description": ""
+        },
+        "25": {
+            "title": "",
+            "description": ""
+        },
+        "24": {
+            "title": "",
+            "description": ""
+        },
+        "23": {
+            "title": "",
+            "description": ""
+        },
+        "22": {
+            "title": "",
+            "description": ""
+        },
+        "21": {
+            "title": "",
+            "description": ""
+        },
+        "20": {
+            "title": "",
+            "description": ""
+        },
+        "19": {
+            "title": "",
+            "description": ""
+        },
+        "18": {
+            "title": "",
+            "description": ""
+        },
+        // ===== 2023 =====
+        "17": {
+            "title": "",
+            "description": ""
+        },
+        "16": {
+            "title": "",
+            "description": ""
+        },
+        "15": {
+            "title": "",
+            "description": ""
+        },
+        "14": {
+            "title": "",
+            "description": ""
+        },
+        "13": {
+            "title": "",
+            "description": ""
+        },
+        "12": {
+            "title": "",
+            "description": ""
+        },
+        "11": {
+            "title": "",
+            "description": ""
+        },
+        "10": {
+            "title": "",
+            "description": ""
+        },
+        "9": {
+            "title": "",
+            "description": ""
+        },
+        "8": {
+            "title": "",
+            "description": ""
+        },
+        "7": {
+            "title": "",
+            "description": ""
+        },
+        "6": {
+            "title": "",
+            "description": ""
+        },
+        "5": {
+            "title": "",
+            "description": ""
+        },
+        "4": {
+            "title": "",
+            "description": ""
+        },
+        "3": {
+            "title": "",
+            "description": ""
+        },
+        "2": {
+            "title": "",
+            "description": ""
+        },
+        "1": {
+            "title": "",
+            "description": ""
+        }
+    },
+    "en": {
+        // ===== 2026 =====
+        "139": {
+            "title": "Chito and Yuuri Journey Through the Backrooms",
+            "description": "Traveling through the Backrooms, they run away after encountering a monster."
+        },
+        "138": {
+            "title": "NYN姉貴 Watching TV",
+            "description": "A sticker you can use whenever you want to express “I’m just here to watch the show,” or in any other situation."
+        },
+        "137": {
+            "title": "Yuuri Got So Hungry She Ate Her Own Gun",
+            "description": "It suddenly came to mind, so I drew it."
+        },
+        "136": {
+            "title": "Kiss Kiss",
+            "description": "I only managed to draw this because I was able to restrain my desires."
+        },
+        "135": {
+            "title": "Forget Me",
+            "description": "I saw a picture on Twitter that I thought was interesting, so I drew something similar."
+        },
+        "134": {
+            "title": "【03】兼任 MagicalDraw",
+            "description": "I was watching Steins;Gate at the time. I really like Kurisu Makise, so I drew her in the background."
+        },
+        "133": {
+            "title": "【Shimeji Simulation】Yamashita True Face Cursor",
+            "description": "Yamashita True Face Cursor"
+        },
+        "132": {
+            "title": "【Shimeji Simulation】Tsukishima Seijaku Cursor",
+            "description": "Tsukishima Seijaku Cursor. I think this is the cursor I’m most satisfied with so far."
+        },
+        "131": {
+            "title": "Portrait in Pastel",
+            "description": "Morikawa-sensei and Sumida-senpai. They both have an artistic side, so they make a perfect pair (?)."
+        },
+        "130": {
+            "title": "【02】Atonement of the Egoist",
+            "description": "A variation."
+        },
+        "129": {
+            "title": "Shimeji Simulation",
+            "description": "I really like rhythm-game illustrations, so I tried to imitate them."
+        },
+        "128": {
+            "title": "【02】Girls’ Last Tour Desktop Wallpaper",
+            "description": "A variation."
+        },
+        "128-2": {
+            "title": "Girls’ Last Tour Desktop Wallpaper",
+            "description": "This is the piece I’m most satisfied with so far. It can be used as a desktop wallpaper, and I used photos from a free stock-material website, photos I took myself, and some textures."
+        },
+        "130-2": {
+            "title": "Atonement of the Egoist",
+            "description": "I thought about the events in the latter half of the manga, so I drew this."
+        },
+        // ===== 2025 =====
+        "127": {
+            "title": "【22】Doodle",
+            "description": "I really like Miku."
+        },
+        "126": {
+            "title": "Yuuri Weird Expression",
+            "description": "I really like this expression."
+        },
+        "125": {
+            "title": "【21】Doodle",
+            "description": "I can’t draw dogs."
+        },
+        "124": {
+            "title": "Childhood / Adulthood",
+            "description": " "
+        },
+        "123": {
+            "title": "Sakiko Disappears",
+            "description": "I like this meme. I made it into a GIF and uploaded it to Tenor, where it appears when you search the keyword."
+        },
+        "122": {
+            "title": "Lying in the Snow",
+            "description": "I made a phone wallpaper, but honestly, I’m not very satisfied with it."
+        },
+        "121": {
+            "title": "I suck",
+            "description": "Mortis: “I can’t play any of them~”"
+        },
+        "120": {
+            "title": "【Girls' Last Tour】Chito Cursor",
+            "description": "Chito Cursor"
+        },
+        "119": {
+            "title": "【02】MGR姉貴",
+            "description": "Some parts were drawn incorrectly."
+        },
+        "118": {
+            "title": "Obscura Lunae",
+            "description": "I like Ave Mujica. The outfit of the character in this piece is the most complicated one I’ve ever drawn. I needed 3D assistance for the character, along with other people’s drawings and official artwork as references. For the composition, I looked at many rhythm-game illustrations, which gave me inspiration."
+        },
+        "117": {
+            "title": "Yin Xiaofeng",
+            "description": "Yin Xiaofeng, the protagonist of Blue Blood Lagoon. I definitely did not draw him just because he is cute."
+        },
+        "116": {
+            "title": "Red Hood",
+            "description": "I was obsessed with BLACK SOULS for a while, so I drew this. I used six photos in it, all from a free stock-photo website."
+        },
+        "115": {
+            "title": "【Girls' Last Tour】Yuuri Cursor",
+            "description": "Yuuri Cursor. Around that time, I was somewhat following Girls’ Last Tour fan works online and noticed that no one had made a complete cursor (?). So I made one."
+        },
+        "114": {
+            "title": "【02】兼任 MagicalDraw",
+            "description": "Kennin is cute."
+        },
+        "113": {
+            "title": "Save Point",
+            "description": "Take a break."
+        },
+        "112": {
+            "title": "【02】Doodling in an accounting textbook",
+            "description": "Just doodling."
+        },
+        "111": {
+            "title": "【20】Doodle",
+            "description": "I drew Kal’tsit. The overhead angle was difficult to draw."
+        },
+        "110": {
+            "title": "Doodling in an accounting textbook",
+            "description": "Class was boring, so I drew this."
+        },
+        "109": {
+            "title": "【19】Doodle",
+            "description": "A character from Arcaea, drawn when I suddenly got inspired."
+        },
+        "108": {
+            "title": "【02】Doodling in an Economics Textbook",
+            "description": "I don’t know what I was drawing."
+        },
+        "107": {
+            "title": "【18】Doodle",
+            "description": "Miku."
+        },
+        "106": {
+            "title": "【17】Doodle",
+            "description": "Miku."
+        },
+        "105": {
+            "title": "【02】Practice",
+            "description": "I hadn’t drawn for a while, so I practiced a bit."
+        },
+        "104": {
+            "title": "RPG Maker MV",
+            "description": "Character."
+        },
+        "103": {
+            "title": "Drawing on A4 Paper",
+            "description": "A sudden burst of inspiration made me draw this."
+        },
+        "102": {
+            "title": "兼任 MagicalDraw",
+            "description": "Kennin is really cute, so I drew her."
+        },
+        "101": {
+            "title": "Mutsumi Wakaba Thinking About Cucumbers",
+            "description": "I forgot what made me draw this."
+        },
+        "100": {
+            "title": "【16】Doodle",
+            "description": "I drew this a few days after the Ave Mujica anime aired."
+        },
+        // ===== 2024 =====
+        "99": {
+            "title": "Discord Group Art OC Exchange",
+            "description": "When drawing this, I referenced two images: one for the background and another for the branches. I really like that person’s original character."
+        },
+        "98": {
+            "title": "【15】Doodle",
+            "description": "Demon Homura’s ability is very powerful, but I actually prefer the original Homura because I really love time stopping."
+        },
+        "97": {
+            "title": "Doodling in an Economics Textbook",
+            "description": "I really like the composition of this one."
+        },
+        "96": {
+            "title": "【14】Doodle",
+            "description": "I drew a character by Drugsneko because they were cute."
+        },
+        "95": {
+            "title": "【13】Doodle",
+            "description": " "
+        },
+        "94": {
+            "title": "【12】Doodle",
+            "description": " "
+        },
+        "93": {
+            "title": "【11】Doodle",
+            "description": " "
+        },
+        "92": {
+            "title": "【10】Doodle",
+            "description": " "
+        },
+        "91": {
+            "title": "Hypothermia",
+            "description": "I originally intended to finish it, but I couldn’t bring myself to, so I gave up."
+        },
+        "90": {
+            "title": "🌕",
+            "description": "The magic of moonlight."
+        },
+        "89": {
+            "title": "【09】Doodle",
+            "description": "Irene."
+        },
+        "88": {
+            "title": "Hatsune Miku’s Outfit",
+            "description": "I originally planned to draw a fan comic, but never finished it."
+        },
+        "87": {
+            "title": "Kal’tsit",
+            "description": "I like Kal’tsit."
+        },
+        "86": {
+            "title": "MGR姉貴",
+            "description": "I suddenly drew this while chatting with friends on Discord. I think this was when the seed of my interest in Cookie☆ was planted in my heart."
+        },
+        "85": {
+            "title": "【03】Happy birthday",
+            "description": "It was Drugsneko’s birthday, so I drew this."
+        },
+        "84": {
+            "title": "Chito Holding a Book",
+            "description": " "
+        },
+        "83": {
+            "title": "Getting a Feel for Drawing",
+            "description": "Sometimes I draw my own avatar/character."
+        },
+        "82": {
+            "title": "【02】Happy birthday",
+            "description": "It was Kaimei’s birthday, so I drew this."
+        },
+        "81": {
+            "title": "Yuuri Touching a Statue",
+            "description": " "
+        },
+        "80": {
+            "title": "Kal’tsit with a Magic Claw",
+            "description": "I remember really liking RaV²’s art around this time, so I imitated their style for a while. I don’t know why they deleted all their Pixiv works; it’s a shame."
+        },
+        "79": {
+            "title": "【02】Hatsune Suddenly Popped into My Head",
+            "description": "Recolored."
+        },
+        "78": {
+            "title": "Happy birthday",
+            "description": "It was MAFU’s birthday, so I drew this."
+        },
+        "77": {
+            "title": "Drawing Drugsneko",
+            "description": "4 head figure proportion is so hard to draw, I don't know how to draw it."
+        },
+        "76": {
+            "title": "Drawing on MS Paint",
+            "description": "Drew a character I really liked in 2024."
+        },
+        "75": {
+            "title": "Drew This Out of Sudden Inspiration",
+            "description": "Originally I was going to color it, but since it was left aside for too long, I didn't feel like coloring it anymore."
+        },
+        "74": {
+            "title": "【08】Doodle",
+            "description": "Drew this after looking at too much of Tsukumizu's work."
+        },
+        "73": {
+            "title": "【07】Doodle",
+            "description": "I am pretty sure I have seen a similar pose on Pinterest."
+        },
+        "72": {
+            "title": "Practice",
+            "description": "I used to enjoy playing this game, but I stopped because something happened that completely grossed me out."
+        },
+        "71": {
+            "title": "【06】Doodle",
+            "description": "Drew this after reading 'Shimeji Simulation'; I really like the paneling and scenes in the manga."
+        },
+        "79-2": {
+            "title": "Hatsune Suddenly Popped into My Head",
+            "description": "I remember really liking なお’s drawings at the time."
+        },
+        // ===== 2023 =====
+        "70": {
+            "title": "【05】Doodle",
+            "description": ""
+        },
+        "69": {
+            "title": "",
+            "description": ""
+        },
+        "68": {
+            "title": "【04】Doodle",
+            "description": ""
+        },
+        "67": {
+            "title": "",
+            "description": ""
+        },
+        "66": {
+            "title": "",
+            "description": ""
+        },
+        "65": {
+            "title": "",
+            "description": ""
+        },
+        "64": {
+            "title": "",
+            "description": ""
+        },
+        "63": {
+            "title": "",
+            "description": ""
+        },
+        "62": {
+            "title": "",
+            "description": ""
+        },
+        "61": {
+            "title": "",
+            "description": ""
+        },
+        "60": {
+            "title": "",
+            "description": ""
+        },
+        "59": {
+            "title": "",
+            "description": ""
+        },
+        "58": {
+            "title": "",
+            "description": ""
+        },
+        "57": {
+            "title": "",
+            "description": ""
+        },
+        "56": {
+            "title": "【03】Doodle",
+            "description": ""
+        },
+        "55": {
+            "title": "【02】Doodle",
+            "description": ""
+        },
+        "54": {
+            "title": "",
+            "description": ""
+        },
+        "53": {
+            "title": "",
+            "description": ""
+        },
+        "52": {
+            "title": "",
+            "description": ""
+        },
+        "51": {
+            "title": "",
+            "description": ""
+        },
+        "50": {
+            "title": "",
+            "description": ""
+        },
+        "49": {
+            "title": "",
+            "description": ""
+        },
+        "48": {
+            "title": "",
+            "description": ""
+        },
+        "47": {
+            "title": "",
+            "description": ""
+        },
+        "46": {
+            "title": "",
+            "description": ""
+        },
+        "45": {
+            "title": "",
+            "description": ""
+        },
+        "44": {
+            "title": "",
+            "description": ""
+        },
+        "43": {
+            "title": "Doodle",
+            "description": ""
+        },
+        "42": {
+            "title": "",
+            "description": ""
+        },
+        "41": {
+            "title": "",
+            "description": ""
+        },
+        "40": {
+            "title": "",
+            "description": ""
+        },
+        "39": {
+            "title": "",
+            "description": ""
+        },
+        "38": {
+            "title": "",
+            "description": ""
+        },
+        "37": {
+            "title": "",
+            "description": ""
+        },
+        "36": {
+            "title": "",
+            "description": ""
+        },
+        "35": {
+            "title": "",
+            "description": ""
+        },
+        "34": {
+            "title": "",
+            "description": ""
+        },
+        "33": {
+            "title": "",
+            "description": ""
+        },
+        "32": {
+            "title": "",
+            "description": ""
+        },
+        "31": {
+            "title": "",
+            "description": ""
+        },
+        "30": {
+            "title": "",
+            "description": ""
+        },
+        "29": {
+            "title": "",
+            "description": ""
+        },
+        "28": {
+            "title": "",
+            "description": ""
+        },
+        "27": {
+            "title": "",
+            "description": ""
+        },
+        "26": {
+            "title": "",
+            "description": ""
+        },
+        "25": {
+            "title": "",
+            "description": ""
+        },
+        "24": {
+            "title": "",
+            "description": ""
+        },
+        "23": {
+            "title": "",
+            "description": ""
+        },
+        "22": {
+            "title": "",
+            "description": ""
+        },
+        "21": {
+            "title": "",
+            "description": ""
+        },
+        "20": {
+            "title": "",
+            "description": ""
+        },
+        "19": {
+            "title": "",
+            "description": ""
+        },
+        "18": {
+            "title": "",
+            "description": ""
+        },
+        // ===== 2023 =====
+        "17": {
+            "title": "",
+            "description": ""
+        },
+        "16": {
+            "title": "",
+            "description": ""
+        },
+        "15": {
+            "title": "",
+            "description": ""
+        },
+        "14": {
+            "title": "",
+            "description": ""
+        },
+        "13": {
+            "title": "",
+            "description": ""
+        },
+        "12": {
+            "title": "",
+            "description": ""
+        },
+        "11": {
+            "title": "",
+            "description": ""
+        },
+        "10": {
+            "title": "",
+            "description": ""
+        },
+        "9": {
+            "title": "",
+            "description": ""
+        },
+        "8": {
+            "title": "",
+            "description": ""
+        },
+        "7": {
+            "title": "",
+            "description": ""
+        },
+        "6": {
+            "title": "",
+            "description": ""
+        },
+        "5": {
+            "title": "",
+            "description": ""
+        },
+        "4": {
+            "title": "",
+            "description": ""
+        },
+        "3": {
+            "title": "",
+            "description": ""
+        },
+        "2": {
+            "title": "",
+            "description": ""
+        },
+        "1": {
+            "title": "",
+            "description": ""
+        }
+    },
+    "ja": {
+        // ===== 2026 =====
+        "139": {
+            "title": "チトとユーリのBackrooms旅行",
+            "description": "Backroomsを旅していたところ、怪物に遭遇して逃げる二人。"
+        },
+        "138": {
+            "title": "NYN姉貴がテレビを見ている",
+            "description": "「私はただ見ているだけ」という気持ちを表したいときなど、いろいろな場面で使えるスタンプです。"
+        },
+        "137": {
+            "title": "ユーリ、お腹が空きすぎて自分の銃を食べることに",
+            "description": "ふと思いついたので描きました。"
+        },
+        "136": {
+            "title": "キスキス",
+            "description": "自分の欲望を抑えられたからこそ、この絵を描くことができました。"
+        },
+        "135": {
+            "title": "私を忘れて",
+            "description": "Twitterで面白い絵を見かけたので、似たような絵を描きました。"
+        },
+        "134": {
+            "title": "【03】兼任 MagicalDraw",
+            "description": "当時『STEINS;GATE』を見ていて、牧瀬紅莉栖がとても好きだったので、後ろに描きました。"
+        },
+        "133": {
+            "title": "【シメジ シミュレーション】山下まじめカーソル",
+            "description": "山下まじめカーソル"
+        },
+        "132": {
+            "title": "【シメジ シミュレーション】月島しじまカーソル",
+            "description": "月島しじまカーソル。たぶん今まで作った中で一番気に入っているカーソルです。"
+        },
+        "131": {
+            "title": "Portrait in Pastel",
+            "description": "もがわ先生とすみだ先輩。二人とも芸術的な才能があって、お似合いの二人（？）です。"
+        },
+        "130": {
+            "title": "【02】Atonement of the Egoist",
+            "description": "差分です。"
+        },
+        "129": {
+            "title": "Shimeji Simulation",
+            "description": "音楽ゲームの曲イラストがとても好きなので、真似してみました。"
+        },
+        "128": {
+            "title": "【02】少女終末旅行 デスクトップ壁紙",
+            "description": "差分です。"
+        },
+        "128-2": {
+            "title": "少女終末旅行 デスクトップ壁紙",
+            "description": "今まで描いた中で一番気に入っている作品です。パソコンの壁紙に使えるようにしてあり、無料素材サイトの写真や自分で撮った写真、いくつかのテクスチャを使っています。"
+        },
+        "130-2": {
+            "title": "Atonement of the Egoist",
+            "description": "漫画後半の展開を思い出して、描きました。"
+        },
+        // ===== 2025 =====
+        "127": {
+            "title": "【22】落書きノート",
+            "description": "初音ミクがけっこう好きです。"
+        },
+        "126": {
+            "title": "ユーリの変な顔",
+            "description": "この表情がけっこう好きです。"
+        },
+        "125": {
+            "title": "【21】落書きノート",
+            "description": "犬が描けません。"
+        },
+        "124": {
+            "title": "子供の頃／大人になってから",
+            "description": " "
+        },
+        "123": {
+            "title": "祥子が消える",
+            "description": "このミームが好きで、GIFにしてTenorに投稿しました。キーワードで検索すると出てきます。"
+        },
+        "122": {
+            "title": "雪の上に寝転ぶ",
+            "description": "スマホ用の壁紙を作りましたが、正直あまり満足していません。"
+        },
+        "121": {
+            "title": "開き直る",
+            "description": "Mortis：「全部弾けない～」"
+        },
+        "120": {
+            "title": "【少女終末旅行】チトカーソル",
+            "description": "チトカーソル"
+        },
+        "119": {
+            "title": "【02】MGR姉貴",
+            "description": "ところどころ描き間違えています。"
+        },
+        "118": {
+            "title": "Obscura Lunae",
+            "description": "Ave Mujicaが好きです。この絵のキャラクターの衣装は、今まで描いた中で一番複雑でした。キャラクターの3D素材や、他の人の絵、公式イラストを参考にしました。構図については音楽ゲームの楽曲イラストをたくさん見て、そこからインスピレーションを得ました。"
+        },
+        "117": {
+            "title": "尹曉風",
+            "description": "『彼女と彼と彼女の澎湖湾』の男性主人公です。彼がかわいいから描いたわけでは、決してありません。"
+        },
+        "116": {
+            "title": "赤ずきん",
+            "description": "以前BLACK SOULSにしばらくハマっていたので描きました。6枚の写真を使っていて、すべて無料素材サイトのものです。"
+        },
+        "115": {
+            "title": "【少女終末旅行】ユーリカーソル",
+            "description": "ユーリカーソル。当時はネット上の『少女終末旅行』の二次創作を多少チェックしていて、完全なカーソルを作った人が誰もいないことに気づいたので、作りました。"
+        },
+        "114": {
+            "title": "【02】兼任 MagicalDraw",
+            "description": "兼任がかわいい。"
+        },
+        "113": {
+            "title": "セーブポイント",
+            "description": "少し休憩。"
+        },
+        "112": {
+            "title": "【02】会計学の教科書に落書きをする",
+            "description": "適当に描きました。"
+        },
+        "111": {
+            "title": "【20】落書きノート",
+            "description": "ケルシーを描きました。俯瞰アングルは難しかったです。"
+        },
+        "110": {
+            "title": "会計学の教科書に落書きをする",
+            "description": "授業が退屈だったので、これを描きました。"
+        },
+        "109": {
+            "title": "【19】落書きノート",
+            "description": "Arcaeaのキャラクター。突然インスピレーションが湧いたときに描きました。"
+        },
+        "108": {
+            "title": "【02】経済学の教科書に落書き",
+            "description": "自分が何を描いているのか分かりませんでした。"
+        },
+        "107": {
+            "title": "【18】落書きノート",
+            "description": "初音ミク。"
+        },
+        "106": {
+            "title": "【17】落書きノート",
+            "description": "初音ミク。"
+        },
+        "105": {
+            "title": "【02】練習",
+            "description": "しばらく絵を描いていなかったので、少し練習しました。"
+        },
+        "104": {
+            "title": "RPG Maker MV",
+            "description": "キャラクター。"
+        },
+        "103": {
+            "title": "A4用紙に描く",
+            "description": "突然ひらめいたので、この絵を描きました。"
+        },
+        "102": {
+            "title": "兼任 MagicalDraw",
+            "description": "兼任が本当にかわいいので、描きました。"
+        },
+        "101": {
+            "title": "若葉睦、キュウリを思う",
+            "description": "なぜこの絵を描いたのか、もう忘れてしまいました。"
+        },
+        "100": {
+            "title": "【16】落書きノート",
+            "description": "Ave Mujicaのアニメが放送されて数日後に、この絵を描きました。"
+        },
+        // ===== 2024 =====
+        "99": {
+            "title": "Discord Group Art OC Exchange",
+            "description": "この絵を描くとき、2枚の絵を参考にしました。1枚は背景、もう1枚は枝です。その人のオリジナルキャラクターがけっこう好きです。"
+        },
+        "98": {
+            "title": "【15】落書きノート",
+            "description": "悪魔ほむらの能力はとても強いですが、実は元のほむらのほうが好きです。時間停止が本当に好きなので。"
+        },
+        "97": {
+            "title": "経済学の教科書に落書き",
+            "description": "この構図がけっこう気に入っています。"
+        },
+        "96": {
+            "title": "【14】落書きノート",
+            "description": "Drugsnekoさんのキャラクターを、かわいかったので描きました。"
+        },
+        "95": {
+            "title": "【13】落書きノート",
+            "description": " "
+        },
+        "94": {
+            "title": "【12】落書きノート",
+            "description": " "
+        },
+        "93": {
+            "title": "【11】落書きノート",
+            "description": " "
+        },
+        "92": {
+            "title": "【10】落書きノート",
+            "description": " "
+        },
+        "91": {
+            "title": "低体温症",
+            "description": "本当は完成させるつもりでしたが、どうしても描き切れなくて諦めました。"
+        },
+        "90": {
+            "title": "🌕",
+            "description": "月光の魔法。"
+        },
+        "89": {
+            "title": "【09】落書きノート",
+            "description": "エリーニ。"
+        },
+        "88": {
+            "title": "初音ミクの衣装",
+            "description": "もともとは二次創作漫画を描くつもりでしたが、完成しませんでした。"
+        },
+        "87": {
+            "title": "ケルシー",
+            "description": "ケルシーが好きです。"
+        },
+        "86": {
+            "title": "MGR姉貴",
+            "description": "Discordで友達と話しているとき、ふと思いついてこの絵を描きました。たぶんこの頃、クッキー☆を好きになる種が心の中に植えられたのだと思います。"
+        },
+        "85": {
+            "title": "【03】誕生日おめでとう",
+            "description": "Drugsnekoさんの誕生日だったので描きました。"
+        },
+        "84": {
+            "title": "本を抱えるチト",
+            "description": " "
+        },
+        "83": {
+            "title": "描き慣らし",
+            "description": "ときどき自分のキャラクターを描きます。"
+        },
+        "82": {
+            "title": "【02】誕生日おめでとう",
+            "description": "兼任の誕生日だったので描きました。"
+        },
+        "81": {
+            "title": "像に触れるユーリ",
+            "description": " "
+        },
+        "80": {
+            "title": "魔爪を持つケルシー",
+            "description": "この頃はRaV²さんの絵がとても好きで、しばらくそのスタイルを真似していました。なぜPixivの絵を全部削除したのかは分かりませんが、残念です。"
+        },
+        "79": {
+            "title": "【02】頭にふと初音ミクの姿が浮かんだ",
+            "description": "塗り直し。"
+        },
+        "78": {
+            "title": "誕生日おめでとう",
+            "description": "MAFUの誕生日だったので描きました。"
+        },
+        "77": {
+            "title": "Drugsnekoを描いた",
+            "description": "4頭身って描くのめちゃくちゃ難しい、私には描けない"
+        },
+        "76": {
+            "title": "ペイントで描いた絵",
+            "description": "2024年当時に結構好きだったキャラクターを描いた"
+        },
+        "75": {
+            "title": "ふとインスピレーションが湧いて描いたもの",
+            "description": "本当は色を塗る予定だったけど、放置しすぎて塗る気がなくなっちゃった"
+        },
+        "74": {
+            "title": "【08】落書きノート",
+            "description": "つくみずさんの作品を見すぎて、これ描いちゃった"
+        },
+        "73": {
+            "title": "【07】落書きノート",
+            "description": "このポーズ、絶対にPinterestで見た覚えがある"
+        },
+        "72": {
+            "title": "練習",
+            "description": "もともとはこのゲームで遊ぶのが好きだったけど、とある件でドン引きして耐えられなくなってやめちゃった"
+        },
+        "71": {
+            "title": "【06】落書きノート",
+            "description": "『シメジシミュレーション』を見て描いた絵。漫画のコマ割りや画面の雰囲気がすごく好きなんだ"
+        },
+        "79-2": {
+            "title": "頭にふと初音ミクの姿が浮かんだ",
+            "description": "当時はなおさんの絵がとても好きだったのを覚えています。"
+        },
+        // ===== 2023 =====
+        "70": {
+            "title": "【05】落書きノート",
+            "description": ""
+        },
+        "69": {
+            "title": "",
+            "description": ""
+        },
+        "68": {
+            "title": "【04】落書きノート",
+            "description": ""
+        },
+        "67": {
+            "title": "",
+            "description": ""
+        },
+        "66": {
+            "title": "",
+            "description": ""
+        },
+        "65": {
+            "title": "",
+            "description": ""
+        },
+        "64": {
+            "title": "",
+            "description": ""
+        },
+        "63": {
+            "title": "",
+            "description": ""
+        },
+        "62": {
+            "title": "",
+            "description": ""
+        },
+        "61": {
+            "title": "",
+            "description": ""
+        },
+        "60": {
+            "title": "",
+            "description": ""
+        },
+        "59": {
+            "title": "",
+            "description": ""
+        },
+        "58": {
+            "title": "",
+            "description": ""
+        },
+        "57": {
+            "title": "",
+            "description": ""
+        },
+        "56": {
+            "title": "【03】落書きノート",
+            "description": ""
+        },
+        "55": {
+            "title": "【02】落書きノート",
+            "description": ""
+        },
+        "54": {
+            "title": "",
+            "description": ""
+        },
+        "53": {
+            "title": "",
+            "description": ""
+        },
+        "52": {
+            "title": "",
+            "description": ""
+        },
+        "51": {
+            "title": "",
+            "description": ""
+        },
+        "50": {
+            "title": "",
+            "description": ""
+        },
+        "49": {
+            "title": "",
+            "description": ""
+        },
+        "48": {
+            "title": "",
+            "description": ""
+        },
+        "47": {
+            "title": "",
+            "description": ""
+        },
+        "46": {
+            "title": "",
+            "description": ""
+        },
+        "45": {
+            "title": "",
+            "description": ""
+        },
+        "44": {
+            "title": "",
+            "description": ""
+        },
+        "43": {
+            "title": "落書きノート",
+            "description": ""
+        },
+        "42": {
+            "title": "",
+            "description": ""
+        },
+        "41": {
+            "title": "",
+            "description": ""
+        },
+        "40": {
+            "title": "",
+            "description": ""
+        },
+        "39": {
+            "title": "",
+            "description": ""
+        },
+        "38": {
+            "title": "",
+            "description": ""
+        },
+        "37": {
+            "title": "",
+            "description": ""
+        },
+        "36": {
+            "title": "",
+            "description": ""
+        },
+        "35": {
+            "title": "",
+            "description": ""
+        },
+        "34": {
+            "title": "",
+            "description": ""
+        },
+        "33": {
+            "title": "",
+            "description": ""
+        },
+        "32": {
+            "title": "",
+            "description": ""
+        },
+        "31": {
+            "title": "",
+            "description": ""
+        },
+        "30": {
+            "title": "",
+            "description": ""
+        },
+        "29": {
+            "title": "",
+            "description": ""
+        },
+        "28": {
+            "title": "",
+            "description": ""
+        },
+        "27": {
+            "title": "",
+            "description": ""
+        },
+        "26": {
+            "title": "",
+            "description": ""
+        },
+        "25": {
+            "title": "",
+            "description": ""
+        },
+        "24": {
+            "title": "",
+            "description": ""
+        },
+        "23": {
+            "title": "",
+            "description": ""
+        },
+        "22": {
+            "title": "",
+            "description": ""
+        },
+        "21": {
+            "title": "",
+            "description": ""
+        },
+        "20": {
+            "title": "",
+            "description": ""
+        },
+        "19": {
+            "title": "",
+            "description": ""
+        },
+        "18": {
+            "title": "",
+            "description": ""
+        },
+        // ===== 2023 =====
+        "17": {
+            "title": "",
+            "description": ""
+        },
+        "16": {
+            "title": "",
+            "description": ""
+        },
+        "15": {
+            "title": "",
+            "description": ""
+        },
+        "14": {
+            "title": "",
+            "description": ""
+        },
+        "13": {
+            "title": "",
+            "description": ""
+        },
+        "12": {
+            "title": "",
+            "description": ""
+        },
+        "11": {
+            "title": "",
+            "description": ""
+        },
+        "10": {
+            "title": "",
+            "description": ""
+        },
+        "9": {
+            "title": "",
+            "description": ""
+        },
+        "8": {
+            "title": "",
+            "description": ""
+        },
+        "7": {
+            "title": "",
+            "description": ""
+        },
+        "6": {
+            "title": "",
+            "description": ""
+        },
+        "5": {
+            "title": "",
+            "description": ""
+        },
+        "4": {
+            "title": "",
+            "description": ""
+        },
+        "3": {
+            "title": "",
+            "description": ""
+        },
+        "2": {
+            "title": "",
+            "description": ""
+        },
+        "1": {
+            "title": "",
+            "description": ""
+        }
+    }
+};
+
+function getGalleryInfo(work) {
+    const currentLanguage = localStorage.getItem('lang') || 'zh-TW';
+
+    const info =
+        galleryWorkInfoData[currentLanguage]?.[work.filename] ||
+        galleryWorkInfoData['zh-TW']?.[work.filename] ||
+        {};
+
+    return {
+        title: info.title || work.filename,
+        description: info.description || '--------'
+    };
+}
+
+/*
+ * 建立作品卡片。
+ * 一般作品會自動嘗試 .jpg → .png。
+ * 2022 年的 1~9 實際檔名為 01~09，因此也會自動嘗試補零版本。
+ * 特殊作品若指定 extension，則直接使用指定副檔名。
+ */
+function createGalleryItem(work) {
+    const button = document.createElement('button');
+    button.className = 'gallery-item';
+    button.type = 'button';
+
+    const info = getGalleryInfo(work);
+
+    button.dataset.title = info.title;
+    button.dataset.description = info.description;
+    button.dataset.date = work.year;
+
+    const image = document.createElement('img');
+    image.alt = `${info.title} (${work.year})`;
+    image.loading = 'lazy';
+
+    const basePath = `./img/art/${work.year}/`;
+    const thumbBasePath = `${basePath}thumbs/`;
+
+    // 原圖路徑只儲存在 data-full-images，不會在預覽階段被瀏覽器載入。
+    // 預覽圖則一律從 thumbs 資料夾載入，以降低 Gallery 初次載入的流量與記憶體使用量。
+    const imagePaths = work.extension
+        ? [`${basePath}${work.filename}${work.extension}`]
+        : [
+            `${basePath}${work.filename}.jpg`,
+            `${basePath}${work.filename}.png`,
+            ...(work.filename.length < 2
+                ? [
+                    `${basePath}${work.filename.padStart(2, '0')}.jpg`,
+                    `${basePath}${work.filename.padStart(2, '0')}.png`
+                ]
+                : [])
+        ];
+
+    const thumbnailPaths = work.extension
+        ? [`${thumbBasePath}${work.filename}${work.extension}`]
+        : [
+            `${thumbBasePath}${work.filename}.jpg`,
+            `${thumbBasePath}${work.filename}.png`,
+            ...(work.filename.length < 2
+                ? [
+                    `${thumbBasePath}${work.filename.padStart(2, '0')}.jpg`,
+                    `${thumbBasePath}${work.filename.padStart(2, '0')}.png`
+                ]
+                : [])
+        ];
+
+    // 將完整原圖候選路徑存起來，直到使用者點擊預覽圖才真正設定 galleryImage.src。
+    button.dataset.fullImages = JSON.stringify(imagePaths);
+
+    let thumbnailIndex = 0;
+    image.src = thumbnailPaths[thumbnailIndex];
+
+    image.addEventListener('error', () => {
+        thumbnailIndex += 1;
+
+        if (thumbnailIndex < thumbnailPaths.length) {
+            image.src = thumbnailPaths[thumbnailIndex];
+        } else {
+            const currentLanguage = localStorage.getItem('lang') || 'zh-TW';
+            const missingText = i18nData[currentLanguage]?.['image-missing'] || '縮圖不存在';
+            image.alt = `${info.title} (${work.year}) — ${missingText}`;
+            button.classList.add('image-missing');
+        }
+    });
+
+    button.appendChild(image);
+    galleryGrid.appendChild(button);
+}
+
+/* ==========================================================
+ * 年份篩選與年份分隔線
+ * ----------------------------------------------------------
+ * 左側核取方塊可以自由勾選年份。
+ * 作品網格會只顯示被勾選的年份，並在每個年份開始前
+ * 自動插入年份標題作為視覺分隔。
+ * ========================================================== */
+
+const mobileYearFilters = document.getElementById('mobile-year-filters');
+const galleryYears = ['2026', '2025', '2024', '2023', '2022'];
+const selectedYears = new Set(galleryYears);
+
+function createYearFilter(year) {
+    const label = document.createElement('label');
+    label.className = 'year-filter-item';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.value = year;
+    checkbox.checked = true;
+    checkbox.setAttribute('aria-label', `顯示 ${year} 年作品`);
+
+    const text = document.createElement('span');
+    text.textContent = year;
+
+    checkbox.addEventListener('change', () => {
+        if (checkbox.checked) {
+            selectedYears.add(year);
+        } else {
+            selectedYears.delete(year);
+        }
+        renderGallery();
+    });
+
+    label.appendChild(checkbox);
+    label.appendChild(text);
+    mobileYearFilters.appendChild(label);
+}
+
+galleryYears.forEach(createYearFilter);
+
+function createYearDivider(year) {
+    const divider = document.createElement('div');
+    divider.className = 'gallery-year-divider';
+    divider.dataset.year = year;
+    divider.innerHTML = `<span>${year}</span>`;
+    return divider;
+}
+
+function renderGallery() {
+    galleryGrid.innerHTML = '';
+
+    const visibleWorks = works.filter((work) => selectedYears.has(work.year));
+
+    if (visibleWorks.length === 0) {
+        const emptyState = document.createElement('div');
+        emptyState.className = 'empty-state gallery-empty-state';
+        const currentLanguage = localStorage.getItem('lang') || 'zh-TW';
+        const emptyText = i18nData[currentLanguage]?.['gallery-empty'] || '請至少勾選一個年份。';
+        emptyState.innerHTML = `<p>${emptyText}</p>`;
+        galleryGrid.appendChild(emptyState);
+        return;
+    }
+
+    let currentYear = '';
+
+    visibleWorks.forEach((work) => {
+        if (work.year !== currentYear) {
+            galleryGrid.appendChild(createYearDivider(work.year));
+            currentYear = work.year;
+        }
+
+        createGalleryItem(work);
+    });
+}
+
+// 按照已排序的 works 建立整個網格。
+renderGallery();
+
+
+/* ==========================================================
+ * 畫廊燈箱控制
+ * ========================================================== */
+
+const galleryModal = document.getElementById('gallery-lightbox');
+const galleryCloseButton = galleryModal.querySelector('.close-btn');
+const galleryWrapper = document.getElementById('gallery-img-wrapper');
+const galleryImage = document.getElementById('gallery-lightbox-img');
+const galleryInfo = document.getElementById('gallery-work-info');
+const galleryTitle = document.getElementById('gallery-work-title');
+const galleryDescription = document.getElementById('gallery-work-description');
+const galleryDate = document.getElementById('gallery-work-date');
+
+let galleryScale = 1;
+let galleryOffsetX = 0;
+let galleryOffsetY = 0;
+let galleryIsDragging = false;
+let galleryIsInteractive = false;
+let galleryTouchMode = '';
+let galleryStartX = 0;
+let galleryStartY = 0;
+let galleryPinchDistance = 0;
+let galleryPinchScale = 1;
+
+function updateGalleryTransform() {
+    if (galleryIsInteractive) {
+        galleryWrapper.style.transform =
+            `translate(calc(-50% + ${galleryOffsetX}px), calc(-50% + ${galleryOffsetY}px))`;
+    } else {
+        galleryWrapper.style.transform = '';
+    }
+
+    galleryImage.style.transform = `scale(${galleryScale})`;
+}
+
+function zoomGalleryAtPoint(nextScale, clientX, clientY) {
+    const previousScale = galleryScale;
+    const clampedScale = Math.min(Math.max(nextScale, 0.5), 4);
+    const pointX = clientX - window.innerWidth / 2;
+    const pointY = clientY - window.innerHeight / 2;
+
+    galleryOffsetX =
+        pointX - (pointX - galleryOffsetX) * clampedScale / previousScale;
+
+    galleryOffsetY =
+        pointY - (pointY - galleryOffsetY) * clampedScale / previousScale;
+
+    galleryScale = clampedScale;
+    updateGalleryTransform();
+}
+
+function touchDistance(firstTouch, secondTouch) {
+    return Math.hypot(
+        secondTouch.clientX - firstTouch.clientX,
+        secondTouch.clientY - firstTouch.clientY
+    );
+}
+
+function openGalleryLightbox(item) {
+    const itemImage = item.querySelector('img');
+    const fullImagePaths = JSON.parse(item.dataset.fullImages || '[]');
+
+    // 這裡才開始載入原圖。預覽階段只使用 thumbs 裡的縮圖。
+    let fullImageIndex = 0;
+
+    galleryImage.alt = itemImage.alt;
+    galleryTitle.textContent = item.dataset.title;
+    galleryDescription.textContent = item.dataset.description;
+    galleryDate.textContent = item.dataset.date;
+
+    const loadFullImage = () => {
+        if (fullImageIndex >= fullImagePaths.length) {
+            galleryImage.removeAttribute('src');
+            galleryImage.alt = `${itemImage.alt}（原圖片不存在）`;
+            return;
+        }
+
+        galleryImage.src = fullImagePaths[fullImageIndex];
+    };
+
+    galleryImage.onerror = () => {
+        fullImageIndex += 1;
+        loadFullImage();
+    };
+
+    loadFullImage();
+
+    galleryScale = 1;
+    galleryOffsetX = 0;
+    galleryOffsetY = 0;
+    galleryIsInteractive = false;
+
+    galleryInfo.hidden = false;
+    galleryModal.classList.remove('is-interactive');
+    galleryModal.classList.remove('zoom-active');
+
+    updateGalleryTransform();
+
+    galleryModal.style.display = 'flex';
+    galleryModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeGalleryLightbox() {
+    galleryModal.style.display = 'none';
+    galleryModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+
+    galleryIsDragging = false;
+    galleryIsInteractive = false;
+    galleryModal.classList.remove('is-interactive', 'zoom-active');
+    galleryWrapper.style.transform = '';
+}
+
+function returnToGalleryCard() {
+    galleryScale = 1;
+    galleryOffsetX = 0;
+    galleryOffsetY = 0;
+    galleryIsDragging = false;
+    galleryIsInteractive = false;
+    galleryInfo.hidden = false;
+
+    galleryModal.classList.remove('is-interactive');
+    galleryModal.classList.remove('zoom-active');
+
+    updateGalleryTransform();
+}
+
+function enableGalleryInteraction() {
+    galleryIsInteractive = true;
+    galleryInfo.hidden = true;
+    galleryModal.classList.add('is-interactive');
+    galleryModal.classList.add('zoom-active');
+
+    updateGalleryTransform();
+}
+
+// 使用事件委派，讓 JavaScript 動態建立的作品卡片也能開啟燈箱。
+galleryGrid.addEventListener('click', (event) => {
+    const item = event.target.closest('.gallery-item');
+
+    if (!item) {
+        return;
+    }
+
+    openGalleryLightbox(item);
+});
+
+galleryCloseButton.addEventListener('click', (event) => {
+    event.stopPropagation();
+    returnToGalleryCard();
+});
+
+const galleryPanel = galleryModal.querySelector('.gallery-lightbox-panel');
+
+galleryModal.addEventListener('click', (event) => {
+
+    const clickedOnImage = event.target === galleryImage;
+    const clickedInsidePanel = galleryPanel.contains(event.target);
+
+    if (galleryIsInteractive) {
+
+        if (!clickedOnImage) {
+            returnToGalleryCard();
+        }
+
+    } else {
+
+        if (clickedOnImage) {
+            enableGalleryInteraction();
+
+        } else if (event.target.closest('.close-btn')) {
+            returnToGalleryCard();
+
+        } else if (!clickedInsidePanel) {
+            closeGalleryLightbox();
+        }
+
+    }
+});
+
+galleryImage.addEventListener('click', (event) => {
+    if (!galleryIsInteractive) {
+        event.stopPropagation();
+        enableGalleryInteraction();
+    }
+});
+
+galleryModal.addEventListener('wheel', (event) => {
+    if (!galleryIsInteractive) {
+        return;
+    }
+
+    event.preventDefault();
+
+    zoomGalleryAtPoint(
+        galleryScale + (event.deltaY < 0 ? 0.1 : -0.1),
+        event.clientX,
+        event.clientY
+    );
+}, { passive: false });
+
+galleryWrapper.addEventListener('mousedown', (event) => {
+    if (!galleryIsInteractive || event.button !== 0) {
+        return;
+    }
+
+    galleryIsDragging = true;
+    galleryStartX = event.clientX - galleryOffsetX;
+    galleryStartY = event.clientY - galleryOffsetY;
+
+    event.preventDefault();
+});
+
+document.addEventListener('mousemove', (event) => {
+    if (!galleryIsDragging) {
+        return;
+    }
+
+    galleryOffsetX = event.clientX - galleryStartX;
+    galleryOffsetY = event.clientY - galleryStartY;
+
+    updateGalleryTransform();
+});
+
+document.addEventListener('mouseup', () => {
+    galleryIsDragging = false;
+});
+
+galleryWrapper.addEventListener('touchstart', (event) => {
+    if (!galleryIsInteractive) {
+        return;
+    }
+
+    event.preventDefault();
+
+    if (event.touches.length === 2) {
+        galleryTouchMode = 'pinch';
+        galleryPinchDistance = touchDistance(
+            event.touches[0],
+            event.touches[1]
+        );
+        galleryPinchScale = galleryScale;
+    } else if (event.touches.length === 1) {
+        galleryTouchMode = 'drag';
+        galleryStartX = event.touches[0].clientX - galleryOffsetX;
+        galleryStartY = event.touches[0].clientY - galleryOffsetY;
+    }
+}, { passive: false });
+
+galleryWrapper.addEventListener('touchmove', (event) => {
+    if (!galleryIsInteractive) {
+        return;
+    }
+
+    event.preventDefault();
+
+    if (event.touches.length === 2) {
+        const currentDistance = touchDistance(
+            event.touches[0],
+            event.touches[1]
+        );
+
+        const centerX =
+            (event.touches[0].clientX + event.touches[1].clientX) / 2;
+
+        const centerY =
+            (event.touches[0].clientY + event.touches[1].clientY) / 2;
+
+        zoomGalleryAtPoint(
+            galleryPinchScale * currentDistance / galleryPinchDistance,
+            centerX,
+            centerY
+        );
+    } else if (
+        event.touches.length === 1 &&
+        galleryTouchMode === 'drag'
+    ) {
+        galleryOffsetX = event.touches[0].clientX - galleryStartX;
+        galleryOffsetY = event.touches[0].clientY - galleryStartY;
+
+        updateGalleryTransform();
+    }
+}, { passive: false });
+
+galleryWrapper.addEventListener('touchend', (event) => {
+    if (event.touches.length === 0) {
+        galleryTouchMode = '';
+    } else if (event.touches.length === 1) {
+        galleryTouchMode = 'drag';
+        galleryStartX = event.touches[0].clientX - galleryOffsetX;
+        galleryStartY = event.touches[0].clientY - galleryOffsetY;
+    }
+});
+
+document.addEventListener('keydown', (event) => {
+    if (
+        event.key === 'Escape' &&
+        galleryModal.style.display === 'flex'
+    ) {
+        if (galleryIsInteractive) {
+            returnToGalleryCard();
+        } else {
+            closeGalleryLightbox();
+        }
+    }
+});
+
+// 全域翻譯資料
+const i18nData = {
+    'zh-TW': {
+        'title': '滅Q - 繪畫',
+        'nav-home': '首頁',
+        'nav-gallery': '繪畫',
+        'nav-about': '關於',
+        'mobile-menu': '選單',
+        'gallery-years': '年份',
+        'gallery-empty': '請至少勾選一個年份。',
+        'image-missing': '縮圖不存在',
+        'image-not-found': '原圖片不存在'
+    },
+    'en': {
+        'title': '滅Q - Gallery',
+        'nav-home': 'Home',
+        'nav-gallery': 'Gallery',
+        'nav-about': 'About',
+        'mobile-menu': 'Menu',
+        'gallery-years': 'Years',
+        'gallery-empty': 'Please select at least one year.',
+        'image-missing': 'Thumbnail not found',
+        'image-not-found': 'Original image not found'
+    },
+    'ja': {
+        'title': '滅Q - ギャラリー',
+        'nav-home': 'ホーム',
+        'nav-gallery': 'ギャラリー',
+        'nav-about': 'プロフィール',
+        'mobile-menu': 'メニュー',
+        'gallery-years': '年',
+        'gallery-empty': '少なくとも1つの年を選択してください。',
+        'image-missing': 'サムネイルが見つかりません',
+        'image-not-found': '元画像が見つかりません'
+    }
+};
+
+function updatePageLanguage(lang) {
+    document.querySelectorAll('[data-i18n]').forEach((element) => {
+        const key = element.getAttribute('data-i18n');
+        if (i18nData[lang] && i18nData[lang][key]) {
+            element.textContent = i18nData[lang][key];
+        }
+    });
+
+    document.documentElement.lang =
+        lang === 'ja'
+            ? 'ja'
+            : lang === 'en'
+                ? 'en'
+                : 'zh-TW';
+
+    // 作品標題與簡介由 JavaScript 動態建立，因此切換語言後重新渲染 Gallery。
+    renderGallery();
+
+    document.documentElement.classList.remove('language-loading');
+}
+
+</script>
+
+</html>

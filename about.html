@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>滅Q - 關於</title>
+    
+    <style>
+        html.language-loading body {
+            visibility: hidden;
+        }
+    </style>
+
+    <script>
+    (function () {
+        const lang = localStorage.getItem('lang');
+
+        if (lang === 'en' || lang === 'ja') {
+            document.documentElement.classList.add('language-loading');
+        }
+    })();
+    </script>
+
+    <!-- 鎖定防閾爆（Anti-Flicker）的內联脚本，在所有上伸的資源加載前執行 -->
+    <script>
+        (function() {
+            // 優先咪取 localStorage 的主題設定，次之依賴系統偏好
+            let themeClass = localStorage.getItem('theme');
+            
+            if (!themeClass) {
+                // 孖測系統偏好，但不墨記存
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                themeClass = prefersDark ? 'dark-theme' : 'light-theme';
+            } else {
+                // localStorage 中存的是 'dark' 或 'light'，需要轉換為 class 名
+                themeClass = themeClass === 'dark' ? 'dark-theme' : 'light-theme';
+            }
+            
+            // 立即應用到 <html> 元素，在駨查器上設之前完成
+            document.documentElement.classList.add(themeClass);
+        })();
+    </script>
+    
+<script>
+(function () {
+    const isMobilePage = location.pathname.split('/').pop().endsWith('_mobile.html');
+    const currentName = location.pathname.split('/').pop();
+
+    const desktopToMobile = {
+        'index.html': 'index_mobile.html',
+        'gallery.html': 'gallery_mobile.html',
+        'about.html': 'about_mobile.html'
+    };
+    const mobileToDesktop = {
+        'index_mobile.html': 'index.html',
+        'gallery_mobile.html': 'gallery.html',
+        'about_mobile.html': 'about.html'
+    };
+
+    function syncPageByViewport() {
+        const isMobileViewport = window.matchMedia('(max-width: 760px)').matches;
+        const target = isMobileViewport
+            ? desktopToMobile[currentName]
+            : mobileToDesktop[currentName];
+
+        if (target && (isMobileViewport !== isMobilePage)) {
+            location.replace(target);
+        }
+    }
+
+    syncPageByViewport();
+
+    const mediaQuery = window.matchMedia('(max-width: 760px)');
+    if (mediaQuery.addEventListener) {
+        mediaQuery.addEventListener('change', syncPageByViewport);
+    } else {
+        mediaQuery.addListener(syncPageByViewport);
+    }
+})();
+</script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 頂部導覽列 -->
+    <header class="navbar">
+        <nav>
+            <div class="nav-links">
+                <a href="index.html" class="nav-item" data-i18n="nav-home">首頁</a>
+                <a href="gallery.html" class="nav-item" data-i18n="nav-gallery">繪畫</a>
+                <!-- 關於目前是 active 狀態 -->
+                <a href="about.html" class="nav-item active" data-i18n="nav-about">關於</a>
+            </div>
+
+            <div class="nav-controls" aria-label="語言與主題設定">
+                <div class="lang-select-wrap">
+                    <select id="lang-select" aria-label="語言切換">
+                        <option value="zh-TW">中文（台灣）</option>
+                        <option value="en">English</option>
+                        <option value="ja">日本語</option>
+                    </select>
+                </div>
+                <button id="theme-toggle" type="button" aria-label="切換黑夜模式">🌙</button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="mobile-controls" aria-label="手機版語言與主題設定">
+        <div class="nav-controls">
+            <div class="lang-select-wrap">
+                <select id="lang-select-mobile" aria-label="手機語言切換">
+                    <option value="zh-TW">中文（台灣）</option>
+                    <option value="en">English</option>
+                    <option value="ja">日本語</option>
+                </select>
+            </div>
+            <button id="theme-toggle-mobile" type="button" aria-label="切換黑夜模式">🌙</button>
+        </div>
+    </div>
+
+    <main class="content-container about-container">
+        <section class="profile-header">
+            <img class="profile-avatar" src="./img/about/頭像.jpg" alt="個人頭像" data-i18n-attr="profile-alt">
+            <div>
+                <p class="eyebrow">ABOUT ME</p>
+                <h1>滅Q</h1>
+                <p class="profile-role" data-i18n="profile-role">畫畫蠻好玩的</p>
+            </div>
+        </section>
+
+        <section class="about-section">
+            <h2 data-i18n="about-heading">個人簡介</h2>
+            <p data-i18n="about-p1">魚好吃，但是吃多了會膩</p>
+            <p data-i18n="about-p2">如果你跟我一樣，在小學時因為看了含有偽娘元素的動畫，而喜歡上了二次元的偽娘，那你的人生跟我一樣，已經毀了......</p>
+        </section>
+
+        <section class="about-section">
+            <h2 data-i18n="skills-heading">業餘技能</h2>
+            <div class="skill-list" aria-label="業餘技能">
+                <span class="skill-tag" data-i18n="skill-drawing">畫畫</span>
+                <span class="skill-tag" data-i18n="skill-nonsense">講廢話</span>
+            </div>
+        </section>
+
+        <section class="about-section">
+            <h2 data-i18n="links-heading">外部連結</h2>
+            <div class="contact-list" aria-label="外部連結">
+                <a href="https://x.com/Qlc2ioQ" target="_blank" rel="noopener noreferrer" data-i18n="link-twitter">推特</a>
+                <a href="https://www.pixiv.net/users/51267092" target="_blank" rel="noopener noreferrer">Pixiv</a>
+            </div>
+        </section>
+    </main>
+
+</body>
+
+<script>
+const themeToggle = document.getElementById('theme-toggle');
+const themeToggleMobile = document.getElementById('theme-toggle-mobile');
+const langSelect = document.getElementById('lang-select');
+const langSelectMobile = document.getElementById('lang-select-mobile');
+
+const themeButtons = [themeToggle, themeToggleMobile].filter(Boolean);
+const languageSelects = [langSelect, langSelectMobile].filter(Boolean);
+
+// 【核心修正】加入鎖定變數，防止兩個下拉選單互相影響、陷入無限重複觸發
+let isSyncingLanguage = false;
+
+function applyStoredTheme(themeName) {
+    const isDark = themeName === 'dark';
+    const themeClass = isDark ? 'dark-theme' : 'light-theme';
+    
+    document.documentElement.classList.remove('light-theme', 'dark-theme');
+    document.documentElement.classList.add(themeClass);
+    document.body.classList.toggle('dark-theme', isDark);
+    
+    themeButtons.forEach((button) => {
+        button.textContent = isDark ? '☀️' : '🌙';
+        button.setAttribute('aria-label', isDark ? '切換為白天模式' : '切換為黑夜模式');
+    });
+}
+
+function applyStoredLanguage(languageCode) {
+    const normalized = ['en', 'ja'].includes(languageCode) ? languageCode : 'zh-TW';
+    const selectedFlag = normalized === 'en' ? './img/other/USA.svg' : normalized === 'ja' ? './img/other/JP.svg' : './img/other/TW.svg';
+
+    document.documentElement.style.setProperty('--lang-flag-url', `url("${selectedFlag}")`);
+
+    // 變更所有下拉選單的顯示文字
+    languageSelects.forEach((select) => {
+        if (select && select.value !== normalized) {
+            select.value = normalized;
+        }
+    });
+
+    // 觸發文字更新
+    if (typeof updatePageLanguage === 'function') {
+        updatePageLanguage(normalized);
+    }
+}
+
+function syncGlobalControls() {
+    try {
+        let savedTheme = localStorage.getItem('theme');
+        if (!savedTheme) {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            savedTheme = prefersDark ? 'dark' : 'light';
+        }
+        
+        const savedLanguage = localStorage.getItem('lang') || 'zh-TW';
+        applyStoredTheme(savedTheme);
+        applyStoredLanguage(savedLanguage);
+    } catch (error) {
+        applyStoredTheme('light');
+        applyStoredLanguage('zh-TW');
+    }
+}
+
+themeButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+        const nextTheme = document.documentElement.classList.contains('dark-theme') ? 'light' : 'dark';
+        try {
+            localStorage.setItem('theme', nextTheme);
+        } catch (error) {
+            // 忽略儲存失敗
+        }
+        applyStoredTheme(nextTheme);
+    });
+});
+
+// 【核心修正】優化監聽事件，防止選單連動時產生 Bug
+languageSelects.forEach((select) => {
+    select.addEventListener('change', (event) => {
+        if (isSyncingLanguage) return; // 如果正在連動中，直接跳過，防止無限迴圈
+        
+        isSyncingLanguage = true;
+        const nextLanguage = ['en', 'ja'].includes(event.target.value) ? event.target.value : 'zh-TW';
+        
+        try {
+            localStorage.setItem('lang', nextLanguage);
+        } catch (error) {
+            // 忽略儲存失敗
+        }
+        
+        applyStoredLanguage(nextLanguage);
+        isSyncingLanguage = false; // 解除鎖定
+    });
+});
+
+document.addEventListener('DOMContentLoaded', syncGlobalControls);
+
+// 全域翻譯資料（【優化】補齊中文內容與所有語系的網頁標題）
+const i18nData = {
+    'zh-TW': {
+        '_title': '滅Q - 關於',
+        'nav-home': '首頁',
+        'nav-gallery': '繪畫',
+        'nav-about': '關於',
+        'profile-role': '畫畫蠻好玩的',
+        'about-heading': '個人簡介',
+        'about-p1': '魚好吃，但是吃多了會膩',
+        'about-p2': '如果你跟我一樣，在小學時因為看了含有偽娘元素的動畫，而喜歡上了二次元的偽娘，那你的人生跟我一樣，已經毀了......',
+        'skills-heading': '業餘技能',
+        'skill-drawing': '畫畫',
+        'skill-nonsense': '講廢話',
+        'links-heading': '外部連結',
+        'link-twitter': '推特',
+        'profile-alt': '個人頭像'
+    },
+    'en': {
+        '_title': '滅Q - About',
+        'nav-home': 'Home',
+        'nav-gallery': 'Gallery',
+        'nav-about': 'About',
+        'profile-role': 'Drawing is pretty fun',
+        'about-heading': 'About Me',
+        'about-p1': 'Fish tastes good, but too much gets boring.',
+        'about-p2': 'If you are like me, and you fell in love with anime-style femboys because you watched an anime with a femboy character in elementary school, then your life is already ruined, just like mine......',
+        'skills-heading': 'Hobby Skills',
+        'skill-drawing': 'Drawing',
+        'skill-nonsense': 'Talking nonsense',
+        'links-heading': 'External Links',
+        'link-twitter': 'Twitter',
+        'profile-alt': 'Profile avatar'
+    },
+    'ja': {
+        '_title': '滅Q - プロフィール',
+        'nav-home': 'ホーム',
+        'nav-gallery': 'ギャラリー',
+        'nav-about': 'プロフィール',
+        'profile-role': '絵を描くのはけっこう楽しい',
+        'about-heading': 'プロフィール',
+        'about-p1': '魚はおいしいけど、食べすぎると飽きる。',
+        'about-p2': 'もしあなたも僕と同じように、小学生の頃に男の娘要素のあるアニメを見て、二次元の男の娘が好きになったのなら、あなたの人生も僕と同じように、もう終わっています……',
+        'skills-heading': '趣味のスキル',
+        'skill-drawing': 'お絵描き',
+        'skill-nonsense': 'くだらない話をする',
+        'links-heading': '外部リンク',
+        'link-twitter': 'Twitter',
+        'profile-alt': 'プロフィール画像'
+    }
+};
+
+function updatePageLanguage(lang) {
+    const validLang = i18nData[lang] ? lang : 'zh-TW';
+    const data = i18nData[validLang];
+    
+    document.documentElement.lang = validLang;
+    
+    // 動態更新網頁標題
+    if (data['_title'] !== undefined) {
+        document.title = data['_title'];
+    }
+    
+    // 翻譯文字內容
+    document.querySelectorAll('[data-i18n]').forEach((element) => {
+        const key = element.getAttribute('data-i18n');
+        if (data[key] !== undefined) {
+            element.textContent = data[key];
+        }
+    });
+    
+    // 翻譯圖片替代文字
+    document.querySelectorAll('[data-i18n-attr]').forEach((element) => {
+        const key = element.getAttribute('data-i18n-attr');
+        if (data[key] !== undefined) {
+            element.setAttribute('alt', data[key]);
+        }
+    });
+
+    document.documentElement.lang =
+        lang === 'ja'
+            ? 'ja'
+            : lang === 'en'
+                ? 'en'
+                : 'zh-TW';
+
+    document.documentElement.classList.remove('language-loading');
+}
+</script>
+
+</html>

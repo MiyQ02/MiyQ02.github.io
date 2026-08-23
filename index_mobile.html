@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title data-i18n="title">滅Q - 首頁</title>
+
+    <style>
+        html.language-loading body {
+            visibility: hidden;
+        }
+    </style>
+
+    <script>
+    (function () {
+        const lang = localStorage.getItem('lang');
+
+        if (lang === 'en' || lang === 'ja') {
+            document.documentElement.classList.add('language-loading');
+        }
+    })();
+    </script>
+
+    <script>
+        (function() {
+            let themeClass = localStorage.getItem('theme');
+            if (!themeClass) {
+                themeClass = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-theme' : 'light-theme';
+            } else {
+                themeClass = themeClass === 'dark' ? 'dark-theme' : 'light-theme';
+            }
+            document.documentElement.classList.add(themeClass);
+        })();
+    </script>
+
+<script>
+(function () {
+    const isMobilePage = location.pathname.split('/').pop().endsWith('_mobile.html');
+    const currentName = location.pathname.split('/').pop();
+
+    const desktopToMobile = {
+        'index.html': 'index_mobile.html',
+        'gallery.html': 'gallery_mobile.html',
+        'about.html': 'about_mobile.html'
+    };
+    const mobileToDesktop = {
+        'index_mobile.html': 'index.html',
+        'gallery_mobile.html': 'gallery.html',
+        'about_mobile.html': 'about.html'
+    };
+
+    function syncPageByViewport() {
+        const isMobileViewport = window.matchMedia('(max-width: 760px)').matches;
+        const target = isMobileViewport
+            ? desktopToMobile[currentName]
+            : mobileToDesktop[currentName];
+
+        if (target && (isMobileViewport !== isMobilePage)) {
+            location.replace(target);
+        }
+    }
+
+    syncPageByViewport();
+
+    const mediaQuery = window.matchMedia('(max-width: 760px)');
+    if (mediaQuery.addEventListener) {
+        mediaQuery.addEventListener('change', syncPageByViewport);
+    } else {
+        mediaQuery.addListener(syncPageByViewport);
+    }
+})();
+</script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="mobile-site-page mobile-index-page">
+    <header class="navbar mobile-navbar">
+        <nav>
+            <button id="mobile-menu-toggle" class="mobile-menu-toggle" type="button"
+                    aria-label="開啟選單" aria-expanded="false">
+                <span class="hamburger-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+                <span data-i18n="mobile-menu">選單</span>
+            </button>
+
+            <div class="nav-controls" aria-label="語言與主題設定">
+                <div class="lang-select-wrap">
+                    <select id="lang-select" aria-label="語言切換">
+                        <option value="zh-TW">中文（台灣）</option>
+                        <option value="en">English</option>
+                        <option value="ja">日本語</option>
+                    </select>
+                </div>
+                <button id="theme-toggle" type="button" aria-label="切換黑夜模式">🌙</button>
+            </div>
+        </nav>
+    </header>
+
+    <div id="mobile-menu-overlay" class="mobile-drawer-overlay" hidden></div>
+
+    <aside id="mobile-menu-drawer" class="mobile-drawer" aria-hidden="true">
+        <div class="mobile-drawer-header">
+            <h2 data-i18n="mobile-menu">選單</h2>
+            <button class="mobile-drawer-close" id="mobile-menu-close" type="button"
+                    aria-label="關閉選單">&times;</button>
+        </div>
+        <nav class="mobile-drawer-links" aria-label="手機版導覽">
+            <a href="index_mobile.html" class="mobile-drawer-link active" data-i18n="nav-home">首頁</a>
+            <a href="gallery_mobile.html" class="mobile-drawer-link" data-i18n="nav-gallery">繪畫</a>
+            <a href="about_mobile.html" class="mobile-drawer-link" data-i18n="nav-about">關於</a>
+        </nav>
+    </aside>
+
+    <main class="content-container mobile-home-container">
+        <!-- 第一個矩形：標題文字區塊 -->
+        <div class="card text-card">
+            <h2 data-i18n="home-title">網路【台灣】</h2>
+        </div>
+
+        <!-- 第二個矩形：插畫展示區塊 -->
+        <div class="card image-card">
+            <!-- 首頁展示的圖片，點擊可放大 -->
+            <img src="./img/home/thumbs/少終(桌布).png" alt="我目前做的最好的作品" class="preview-img" id="trigger-img" data-full-src="./img/home/少終(桌布).png">
+        </div>
+
+        <p style="text-align: center;" data-i18n="home-explain">網站的英文跟日文語言均由AI 工具翻譯</p >
+
+        <!-- 彈出式燈箱層（預設隱藏） -->
+        <div id="lightbox-modal" class="lightbox">
+            <span class="close-btn">&times;</span>
+            <div class="lightbox-content-wrapper" id="img-wrapper">
+                <img id="lightbox-img" src="" alt="放大檢視">
+            </div>
+        </div>
+    </main>
+
+<script>
+const themeToggle = document.getElementById('theme-toggle');
+const langSelect = document.getElementById('lang-select');
+const themeButtons = [themeToggle].filter(Boolean);
+const languageSelects = [langSelect].filter(Boolean);
+
+const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+const mobileMenuDrawer = document.getElementById('mobile-menu-drawer');
+const mobileMenuClose = document.getElementById('mobile-menu-close');
+const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+
+function closeMobileMenu() {
+    if (!mobileMenuDrawer) return;
+    mobileMenuDrawer.classList.remove('is-open');
+    mobileMenuDrawer.setAttribute('aria-hidden', 'true');
+    mobileMenuToggle?.setAttribute('aria-expanded', 'false');
+    if (mobileMenuOverlay) mobileMenuOverlay.hidden = true;
+    document.body.classList.remove('drawer-open');
+}
+
+function openMobileMenu() {
+    mobileMenuDrawer?.classList.add('is-open');
+    mobileMenuDrawer?.setAttribute('aria-hidden', 'false');
+    mobileMenuToggle?.setAttribute('aria-expanded', 'true');
+    if (mobileMenuOverlay) mobileMenuOverlay.hidden = false;
+    document.body.classList.add('drawer-open');
+}
+
+mobileMenuToggle?.addEventListener('click', openMobileMenu);
+mobileMenuClose?.addEventListener('click', closeMobileMenu);
+mobileMenuOverlay?.addEventListener('click', closeMobileMenu);
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeMobileMenu();
+});
+
+function applyStoredTheme(themeName) {
+    const isDark = themeName === 'dark';
+    document.documentElement.classList.remove('light-theme', 'dark-theme');
+    document.documentElement.classList.add(isDark ? 'dark-theme' : 'light-theme');
+    document.body.classList.toggle('dark-theme', isDark);
+
+    themeButtons.forEach((button) => {
+        button.textContent = isDark ? '☀️' : '🌙';
+        button.setAttribute('aria-label', isDark ? '切換為白天模式' : '切換為黑夜模式');
+    });
+}
+
+function applyStoredLanguage(languageCode) {
+    const normalized = ['en', 'ja'].includes(languageCode) ? languageCode : 'zh-TW';
+    document.documentElement.style.setProperty(
+        '--lang-flag-url',
+        `url("${normalized === 'en' ? './img/other/USA.svg' : normalized === 'ja' ? './img/other/JP.svg' : './img/other/TW.svg'}")`
+    );
+    languageSelects.forEach((select) => select.value = normalized);
+    if (typeof updatePageLanguage === 'function') updatePageLanguage(normalized);
+}
+
+function syncGlobalControls() {
+    try {
+        let savedTheme = localStorage.getItem('theme');
+        if (!savedTheme) savedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        applyStoredTheme(savedTheme);
+        applyStoredLanguage(localStorage.getItem('lang') || 'zh-TW');
+    } catch (error) {
+        applyStoredTheme('light');
+        applyStoredLanguage('zh-TW');
+    }
+}
+
+themeButtons.forEach((button) => button.addEventListener('click', () => {
+    const nextTheme = document.documentElement.classList.contains('dark-theme') ? 'light' : 'dark';
+    try { localStorage.setItem('theme', nextTheme); } catch (error) {}
+    applyStoredTheme(nextTheme);
+}));
+
+languageSelects.forEach((select) => select.addEventListener('change', (event) => {
+    const nextLanguage = ['en', 'ja'].includes(event.target.value) ? event.target.value : 'zh-TW';
+    try { localStorage.setItem('lang', nextLanguage); } catch (error) {}
+    applyStoredLanguage(nextLanguage);
+}));
+
+const i18nData = {
+    'zh-TW': {
+        'title': '滅Q - 首頁',
+        'nav-home': '首頁',
+        'nav-gallery': '繪畫',
+        'nav-about': '關於',
+        'mobile-menu': '選單',
+        'home-title': '網路【台灣】',
+        'home-explain': '該網站的英文跟日文語言均由AI 工具翻譯',
+    },
+    'en': {
+        'title': '滅Q - Home',
+        'nav-home': 'Home',
+        'nav-gallery': 'Gallery',
+        'nav-about': 'About',
+        'mobile-menu': 'Menu',
+        'home-title': 'Web【TW】',
+        'home-explain': '"The English and Japanese versions of this website are translated by AI tools."',
+    },
+    'ja': {
+        'title': '滅Q - ホーム',
+        'nav-home': 'ホーム',
+        'nav-gallery': 'ギャラリー',
+        'nav-about': 'プロフィール',
+        'mobile-menu': 'メニュー',
+        'home-title': 'Web【台湾】',
+        'home-explain': '「本サイトの英語と日本語はAIツールで翻訳されています。」'
+    }
+};
+
+function updatePageLanguage(lang) {
+    document.querySelectorAll('[data-i18n]').forEach((element) => {
+        const key = element.getAttribute('data-i18n');
+        if (i18nData[lang]?.[key]) element.textContent = i18nData[lang][key];
+    });
+
+    document.documentElement.lang =
+        lang === 'ja'
+            ? 'ja'
+            : lang === 'en'
+                ? 'en'
+                : 'zh-TW';
+
+    document.documentElement.classList.remove('language-loading');
+}
+
+document.addEventListener('DOMContentLoaded', syncGlobalControls);
+
+// 首頁圖片燈箱：縮圖預覽，點擊後才載入原圖；支援滾輪縮放、拖曳與手機雙指縮放。
+const triggerImage = document.getElementById('trigger-img');
+const lightboxModal = document.getElementById('lightbox-modal');
+const closeButton = document.querySelector('.close-btn');
+const imageWrapper = document.getElementById('img-wrapper');
+const lightboxImage = document.getElementById('lightbox-img');
+
+let scale = 1;
+let offsetX = 0;
+let offsetY = 0;
+let isDragging = false;
+let touchMode = '';
+let pinchStartDistance = 0;
+let pinchStartScale = 1;
+let startX = 0;
+let startY = 0;
+
+function updateImageTransform() {
+    imageWrapper.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+    lightboxImage.style.transform = `scale(${scale})`;
+}
+
+function zoomAtPoint(nextScale, clientX, clientY) {
+    const previousScale = scale;
+    const clampedScale = Math.min(Math.max(nextScale, 0.5), 4);
+    const pointX = clientX - window.innerWidth / 2;
+    const pointY = clientY - window.innerHeight / 2;
+
+    offsetX = pointX - (pointX - offsetX) * clampedScale / previousScale;
+    offsetY = pointY - (pointY - offsetY) * clampedScale / previousScale;
+    scale = clampedScale;
+    updateImageTransform();
+}
+
+function getTouchDistance(firstTouch, secondTouch) {
+    return Math.hypot(
+        secondTouch.clientX - firstTouch.clientX,
+        secondTouch.clientY - firstTouch.clientY
+    );
+}
+
+function getTouchCenter(firstTouch, secondTouch) {
+    return {
+        x: (firstTouch.clientX + secondTouch.clientX) / 2,
+        y: (firstTouch.clientY + secondTouch.clientY) / 2
+    };
+}
+
+function openLightbox() {
+    const fullSrc = triggerImage.dataset.fullSrc;
+    lightboxImage.src = fullSrc || triggerImage.src;
+    lightboxImage.alt = triggerImage.alt;
+    scale = 1;
+    offsetX = 0;
+    offsetY = 0;
+    updateImageTransform();
+    lightboxModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    lightboxModal.style.display = 'none';
+    document.body.style.overflow = '';
+    isDragging = false;
+    touchMode = '';
+}
+
+triggerImage?.addEventListener('click', openLightbox);
+closeButton?.addEventListener('click', closeLightbox);
+
+lightboxModal?.addEventListener('click', (event) => {
+    if (event.target === lightboxModal) closeLightbox();
+});
+
+lightboxModal?.addEventListener('wheel', (event) => {
+    event.preventDefault();
+    zoomAtPoint(scale + (event.deltaY < 0 ? 0.1 : -0.1), event.clientX, event.clientY);
+}, { passive: false });
+
+imageWrapper?.addEventListener('mousedown', (event) => {
+    if (event.button !== 0) return;
+    isDragging = true;
+    startX = event.clientX - offsetX;
+    startY = event.clientY - offsetY;
+    event.preventDefault();
+});
+
+document.addEventListener('mousemove', (event) => {
+    if (!isDragging) return;
+    offsetX = event.clientX - startX;
+    offsetY = event.clientY - startY;
+    updateImageTransform();
+});
+
+document.addEventListener('mouseup', () => {
+    isDragging = false;
+});
+
+imageWrapper?.addEventListener('touchstart', (event) => {
+    event.preventDefault();
+    if (event.touches.length === 2) {
+        touchMode = 'pinch';
+        pinchStartDistance = getTouchDistance(event.touches[0], event.touches[1]);
+        pinchStartScale = scale;
+    } else if (event.touches.length === 1) {
+        touchMode = 'drag';
+        startX = event.touches[0].clientX - offsetX;
+        startY = event.touches[0].clientY - offsetY;
+    }
+}, { passive: false });
+
+imageWrapper?.addEventListener('touchmove', (event) => {
+    event.preventDefault();
+    if (event.touches.length === 2) {
+        if (touchMode !== 'pinch') {
+            touchMode = 'pinch';
+            pinchStartDistance = getTouchDistance(event.touches[0], event.touches[1]);
+            pinchStartScale = scale;
+        }
+        const currentDistance = getTouchDistance(event.touches[0], event.touches[1]);
+        const currentCenter = getTouchCenter(event.touches[0], event.touches[1]);
+        zoomAtPoint(
+            pinchStartScale * currentDistance / pinchStartDistance,
+            currentCenter.x,
+            currentCenter.y
+        );
+    } else if (event.touches.length === 1 && touchMode === 'drag') {
+        offsetX = event.touches[0].clientX - startX;
+        offsetY = event.touches[0].clientY - startY;
+        updateImageTransform();
+    }
+}, { passive: false });
+
+imageWrapper?.addEventListener('touchend', (event) => {
+    if (event.touches.length === 0) {
+        touchMode = '';
+        return;
+    }
+    if (event.touches.length === 1) {
+        touchMode = 'drag';
+        startX = event.touches[0].clientX - offsetX;
+        startY = event.touches[0].clientY - offsetY;
+    }
+});
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && lightboxModal?.style.display === 'flex') {
+        closeLightbox();
+    }
+});
+
+</script>
+</html>

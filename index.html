@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title data-i18n="title">滅Q - 首頁</title>
+    
+    <style>
+        html.language-loading body {
+            visibility: hidden;
+        }
+    </style>
+
+    <script>
+    (function () {
+        const lang = localStorage.getItem('lang');
+
+        if (lang === 'en' || lang === 'ja') {
+            document.documentElement.classList.add('language-loading');
+        }
+    })();
+    </script>
+
+    <!-- 鎖定防閾爆（Anti-Flicker）的內联脚本，在所有上伸的資源加載前執行 -->
+    <script>
+        (function() {
+            // 優先咪取 localStorage 的主題設定，次之依賴系統偏好
+            let themeClass = localStorage.getItem('theme');
+            
+            if (!themeClass) {
+                // 孖測系統偏好，但不墨記存
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                themeClass = prefersDark ? 'dark-theme' : 'light-theme';
+            } else {
+                // localStorage 中存的是 'dark' 或 'light'，需要轉換為 class 名
+                themeClass = themeClass === 'dark' ? 'dark-theme' : 'light-theme';
+            }
+            
+            // 立即應用到 <html> 元素，在駨查器上設之前完成
+            document.documentElement.classList.add(themeClass);
+        })();
+    </script>
+    
+<script>
+(function () {
+    const isMobilePage = location.pathname.split('/').pop().endsWith('_mobile.html');
+    const currentName = location.pathname.split('/').pop();
+
+    const desktopToMobile = {
+        'index.html': 'index_mobile.html',
+        'gallery.html': 'gallery_mobile.html',
+        'about.html': 'about_mobile.html'
+    };
+    const mobileToDesktop = {
+        'index_mobile.html': 'index.html',
+        'gallery_mobile.html': 'gallery.html',
+        'about_mobile.html': 'about.html'
+    };
+
+    function syncPageByViewport() {
+        const isMobileViewport = window.matchMedia('(max-width: 760px)').matches;
+        const target = isMobileViewport
+            ? desktopToMobile[currentName]
+            : mobileToDesktop[currentName];
+
+        if (target && (isMobileViewport !== isMobilePage)) {
+            location.replace(target);
+        }
+    }
+
+    syncPageByViewport();
+
+    const mediaQuery = window.matchMedia('(max-width: 760px)');
+    if (mediaQuery.addEventListener) {
+        mediaQuery.addEventListener('change', syncPageByViewport);
+    } else {
+        mediaQuery.addListener(syncPageByViewport);
+    }
+})();
+</script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 頂部導覽列 -->
+    <header class="navbar">
+        <nav>
+            <div class="nav-links">
+                <!-- 連結到各自的檔案，首頁目前是 active 狀態 -->
+                <a href="index.html" class="nav-item active" data-i18n="nav-home">首頁</a>
+                <a href="gallery.html" class="nav-item" data-i18n="nav-gallery">繪畫</a>
+                <a href="about.html" class="nav-item" data-i18n="nav-about">關於</a>
+            </div>
+
+            <div class="nav-controls" aria-label="語言與主題設定">
+                <div class="lang-select-wrap">
+                    <select id="lang-select" aria-label="語言切換">
+                        <option value="zh-TW">中文（台灣）</option>
+                        <option value="en">English</option>
+                        <option value="ja">日本語</option>
+                    </select>
+                </div>
+                <button id="theme-toggle" type="button" aria-label="切換黑夜模式">🌙</button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="mobile-controls" aria-label="手機版語言與主題設定">
+        <div class="nav-controls">
+            <div class="lang-select-wrap">
+                <select id="lang-select-mobile" aria-label="手機語言切換">
+                    <option value="zh-TW">中文（台灣）</option>
+                    <option value="en">English</option>
+                    <option value="ja">日本語</option>
+                </select>
+            </div>
+            <button id="theme-toggle-mobile" type="button" aria-label="切換黑夜模式">🌙</button>
+        </div>
+    </div>
+
+    <!-- 首頁主要內容區塊 -->
+    <main class="content-container">     
+        <!-- 第一個矩形：標題文字區塊 -->
+        <div class="card text-card">
+            <h2 data-i18n="home-title">網路【台灣】</h2>
+        </div>
+
+        <!-- 第二個矩形：插畫展示區塊 -->
+        <div class="card image-card">
+            <!-- 首頁展示的圖片，點擊可放大 -->
+            <img src="./img/home/thumbs/少終(桌布).png" alt="我目前做的最好的作品" class="preview-img" id="trigger-img" data-full-src="./img/home/少終(桌布).png">
+        </div>
+
+        <p style="text-align: center;" data-i18n="home-explain">網站的英文跟日文語言均由AI 工具翻譯</p >
+
+        <!-- 彈出式燈箱層（預設隱藏） -->
+        <div id="lightbox-modal" class="lightbox">
+            <span class="close-btn">&times;</span>
+            <div class="lightbox-content-wrapper" id="img-wrapper">
+                <img id="lightbox-img" src="" alt="放大檢視">
+            </div>
+        </div>
+    </main>
+
+</body>
+
+<script>
+// 全域翻譯資料
+const i18nData = {
+    'zh-TW': {
+        'title': '滅Q - 首頁',
+        'nav-home': '首頁',
+        'nav-gallery': '繪畫',
+        'nav-about': '關於',
+        'home-title': '網路【台灣】',
+        'home-explain': '該網站的英文跟日文語言均由AI 工具翻譯',
+    },
+    'en': {
+        'title': '滅Q - Home',
+        'nav-home': 'Home',
+        'nav-gallery': 'Gallery',
+        'nav-about': 'About',
+        'home-title': 'Web【Taiwan】',
+        'home-explain': '"The English and Japanese versions of this website are translated by AI tools."',
+    },
+    'ja': {
+        'title': '滅Q - ホーム',
+        'nav-home': 'ホーム',
+        'nav-gallery': 'ギャラリー',
+        'nav-about': 'プロフィール',
+        'home-title': 'Web【台湾】',
+        'home-explain': '「本サイトの英語と日本語はAIツールで翻訳されています。」'
+    }
+};
+
+function updatePageLanguage(lang) {
+    document.querySelectorAll('[data-i18n]').forEach((element) => {
+        const key = element.getAttribute('data-i18n');
+        if (i18nData[lang] && i18nData[lang][key]) {
+            element.textContent = i18nData[lang][key];
+        }
+    });
+
+    document.documentElement.lang =
+        lang === 'ja'
+            ? 'ja'
+            : lang === 'en'
+                ? 'en'
+                : 'zh-TW';
+
+    document.documentElement.classList.remove('language-loading');
+}
+
+const themeToggle = document.getElementById('theme-toggle');
+const themeToggleMobile = document.getElementById('theme-toggle-mobile');
+const langSelect = document.getElementById('lang-select');
+const langSelectMobile = document.getElementById('lang-select-mobile');
+
+const themeButtons = [themeToggle, themeToggleMobile].filter(Boolean);
+const languageSelects = [langSelect, langSelectMobile].filter(Boolean);
+
+function applyStoredTheme(themeName) {
+    const isDark = themeName === 'dark';
+    const themeClass = isDark ? 'dark-theme' : 'light-theme';
+    
+    // 在 html 元素上設置主題（防閃爍）
+    document.documentElement.classList.remove('light-theme', 'dark-theme');
+    document.documentElement.classList.add(themeClass);
+    
+    // 相容性：也在 body 上設置
+    document.body.classList.toggle('dark-theme', isDark);
+    
+    themeButtons.forEach((button) => {
+        button.textContent = isDark ? '☀️' : '🌙';
+        button.setAttribute('aria-label', isDark ? '切換為白天模式' : '切換為黑夜模式');
+    });
+}
+
+function applyStoredLanguage(languageCode) {
+    const normalized = ['en', 'ja'].includes(languageCode) ? languageCode : 'zh-TW';
+    const selectedFlag = normalized === 'en' ? './img/other/USA.svg' : normalized === 'ja' ? './img/other/JP.svg' : './img/other/TW.svg';
+
+    document.documentElement.style.setProperty('--lang-flag-url', `url("${selectedFlag}")`);
+
+    languageSelects.forEach((select) => {
+        if (select) {
+            select.value = normalized;
+        }
+    });
+    // 更新頁面內容文字
+    if (typeof updatePageLanguage === 'function') {
+        updatePageLanguage(normalized);
+    }
+}
+
+function syncGlobalControls() {
+    try {
+        let savedTheme = localStorage.getItem('theme');
+        
+        // 如果沒有儲存過主題，則根據系統偏好自動設定
+        if (!savedTheme) {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            savedTheme = prefersDark ? 'dark' : 'light';
+        }
+        
+        const savedLanguage = localStorage.getItem('lang') || 'zh-TW';
+        applyStoredTheme(savedTheme);
+        applyStoredLanguage(savedLanguage);
+    } catch (error) {
+        applyStoredTheme('light');
+        applyStoredLanguage('zh-TW');
+    }
+}
+
+themeButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+        const nextTheme = document.documentElement.classList.contains('dark-theme') ? 'light' : 'dark';
+        try {
+            localStorage.setItem('theme', nextTheme);
+        } catch (error) {
+            // 忽略儲存失敗，保留前端預設值。
+        }
+        applyStoredTheme(nextTheme);
+    });
+});
+
+languageSelects.forEach((select) => {
+    select.addEventListener('change', (event) => {
+        const nextLanguage = ['en', 'ja'].includes(event.target.value) ? event.target.value : 'zh-TW';
+        try {
+            localStorage.setItem('lang', nextLanguage);
+        } catch (error) {
+            // 忽略儲存失敗，保留前端預設值。
+        }
+        applyStoredLanguage(nextLanguage);
+    });
+});
+
+document.addEventListener('DOMContentLoaded', syncGlobalControls);
+
+// 處理圖片點擊放大燈箱、滑鼠滾輪縮放與滑鼠左鍵拖曳移動圖片的完整邏輯
+
+const triggerImage = document.getElementById('trigger-img');
+const lightboxModal = document.getElementById('lightbox-modal');
+const closeButton = document.querySelector('.close-btn');
+const imageWrapper = document.getElementById('img-wrapper');
+const lightboxImage = document.getElementById('lightbox-img');
+
+let scale = 1;
+let offsetX = 0;
+let offsetY = 0;
+let isDragging = false;
+let touchMode = '';
+let pinchStartDistance = 0;
+let pinchStartScale = 1;
+let startX = 0;
+let startY = 0;
+
+function updateImageTransform() {
+    imageWrapper.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+    lightboxImage.style.transform = `scale(${scale})`;
+}
+
+function zoomAtPoint(nextScale, clientX, clientY) {
+    const previousScale = scale;
+    const clampedScale = Math.min(Math.max(nextScale, 0.5), 4);
+    const pointX = clientX - window.innerWidth / 2;
+    const pointY = clientY - window.innerHeight / 2;
+
+    offsetX = pointX - (pointX - offsetX) * clampedScale / previousScale;
+    offsetY = pointY - (pointY - offsetY) * clampedScale / previousScale;
+    scale = clampedScale;
+    updateImageTransform();
+}
+
+function getTouchDistance(firstTouch, secondTouch) {
+    return Math.hypot(
+        secondTouch.clientX - firstTouch.clientX,
+        secondTouch.clientY - firstTouch.clientY
+    );
+}
+
+function getTouchCenter(firstTouch, secondTouch) {
+    return {
+        x: (firstTouch.clientX + secondTouch.clientX) / 2,
+        y: (firstTouch.clientY + secondTouch.clientY) / 2
+    };
+}
+
+function openLightbox() {
+    const fullSrc = triggerImage.dataset.fullSrc;
+    if (fullSrc) {
+        lightboxImage.src = fullSrc;
+    } else {
+        lightboxImage.src = triggerImage.src;
+    }
+    lightboxImage.alt = triggerImage.alt;
+    scale = 1;
+    offsetX = 0;
+    offsetY = 0;
+    updateImageTransform();
+    lightboxModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    lightboxModal.style.display = 'none';
+    document.body.style.overflow = '';
+    isDragging = false;
+}
+
+triggerImage.addEventListener('click', openLightbox);
+closeButton.addEventListener('click', closeLightbox);
+
+lightboxModal.addEventListener('click', (event) => {
+    if (event.target === lightboxModal) {
+        closeLightbox();
+    }
+});
+
+lightboxModal.addEventListener('wheel', (event) => {
+    event.preventDefault();
+    zoomAtPoint(scale + (event.deltaY < 0 ? 0.1 : -0.1), event.clientX, event.clientY);
+}, { passive: false });
+
+imageWrapper.addEventListener('mousedown', (event) => {
+    if (event.button !== 0) {
+        return;
+    }
+
+    isDragging = true;
+    startX = event.clientX - offsetX;
+    startY = event.clientY - offsetY;
+    event.preventDefault();
+});
+
+document.addEventListener('mousemove', (event) => {
+    if (!isDragging) {
+        return;
+    }
+
+    offsetX = event.clientX - startX;
+    offsetY = event.clientY - startY;
+    updateImageTransform();
+});
+
+document.addEventListener('mouseup', () => {
+    isDragging = false;
+});
+
+imageWrapper.addEventListener('touchstart', (event) => {
+    event.preventDefault();
+    if (event.touches.length === 2) {
+        touchMode = 'pinch';
+        pinchStartDistance = getTouchDistance(event.touches[0], event.touches[1]);
+        pinchStartScale = scale;
+    } else if (event.touches.length === 1) {
+        touchMode = 'drag';
+        startX = event.touches[0].clientX - offsetX;
+        startY = event.touches[0].clientY - offsetY;
+    }
+}, { passive: false });
+
+imageWrapper.addEventListener('touchmove', (event) => {
+    event.preventDefault();
+    if (event.touches.length === 2) {
+        if (touchMode !== 'pinch') {
+            touchMode = 'pinch';
+            pinchStartDistance = getTouchDistance(event.touches[0], event.touches[1]);
+            pinchStartScale = scale;
+        }
+
+        const currentDistance = getTouchDistance(event.touches[0], event.touches[1]);
+        const currentCenter = getTouchCenter(event.touches[0], event.touches[1]);
+        zoomAtPoint(
+            pinchStartScale * currentDistance / pinchStartDistance,
+            currentCenter.x,
+            currentCenter.y
+        );
+    } else if (event.touches.length === 1 && touchMode === 'drag') {
+        offsetX = event.touches[0].clientX - startX;
+        offsetY = event.touches[0].clientY - startY;
+        updateImageTransform();
+    }
+}, { passive: false });
+
+imageWrapper.addEventListener('touchend', (event) => {
+    if (event.touches.length === 0) {
+        touchMode = '';
+        return;
+    }
+
+    if (event.touches.length === 1) {
+        touchMode = 'drag';
+        startX = event.touches[0].clientX - offsetX;
+        startY = event.touches[0].clientY - offsetY;
+    }
+});
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && lightboxModal.style.display === 'flex') {
+        closeLightbox();
+    }
+});
+</script>
+</html>
