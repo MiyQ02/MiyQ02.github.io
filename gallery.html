@@ -2270,6 +2270,10 @@ let galleryStartY = 0;
 let galleryPinchDistance = 0;
 let galleryPinchScale = 1;
 
+// 已成功載入過的原圖會保留在記憶體中。
+// 之後再次開啟同一張作品時，直接使用快取，不再經過縮圖 → 原圖的模糊轉場。
+const galleryFullImageCache = new Map();
+
 function updateGalleryTransform() {
     if (galleryIsInteractive) {
         galleryWrapper.style.transform =
@@ -2307,33 +2311,71 @@ function touchDistance(firstTouch, secondTouch) {
 function openGalleryLightbox(item) {
     const itemImage = item.querySelector('img');
     const fullImagePaths = JSON.parse(item.dataset.fullImages || '[]');
-
-    // 這裡才開始載入原圖。預覽階段只使用 thumbs 裡的縮圖。
-    let fullImageIndex = 0;
+    const thumbnailSrc = itemImage.currentSrc || itemImage.src;
+    const cacheKey = fullImagePaths[0] || thumbnailSrc;
 
     galleryImage.alt = itemImage.alt;
     galleryTitle.textContent = item.dataset.title;
     galleryDescription.textContent = item.dataset.description;
     galleryDate.textContent = item.dataset.date;
 
-    const loadFullImage = () => {
-        if (fullImageIndex >= fullImagePaths.length) {
-            galleryImage.removeAttribute('src');
-            const currentLanguage = localStorage.getItem('lang') || 'zh-TW';
-            const missingText = i18nData[currentLanguage]?.['image-not-found'] || '原圖片不存在';
-            galleryImage.alt = `${itemImage.alt} — ${missingText}`;
-            return;
-        }
+    // 先重置成「這一張作品自己的縮圖」，避免切換作品時短暫顯示上一張原圖。
+    // 第一次開啟時會由縮圖開始，再無縫換成原圖。
+    galleryImage.src = thumbnailSrc;
+    galleryImage.classList.remove('is-full-loaded');
+    galleryImage.classList.add('is-loading-full');
 
-        galleryImage.src = fullImagePaths[fullImageIndex];
-    };
+    const cachedImage = galleryFullImageCache.get(cacheKey);
 
-    galleryImage.onerror = () => {
-        fullImageIndex += 1;
+    if (cachedImage) {
+        // 這張原圖之前已經完整載入過：直接顯示原圖，不再顯示模糊縮圖。
+        galleryImage.src = cachedImage.src;
+        galleryImage.classList.remove('is-loading-full');
+        galleryImage.classList.add('is-full-loaded');
+    } else {
+        let fullImageIndex = 0;
+
+        const loadFullImage = () => {
+            if (fullImageIndex >= fullImagePaths.length) {
+                galleryImage.classList.remove('is-loading-full');
+                galleryImage.removeAttribute('src');
+                const currentLanguage = localStorage.getItem('lang') || 'zh-TW';
+                const missingText = i18nData[currentLanguage]?.['image-not-found'] || '原圖片不存在';
+                galleryImage.alt = `${itemImage.alt} — ${missingText}`;
+                return;
+            }
+
+            const preload = new Image();
+            preload.decoding = 'async';
+            preload.onload = async () => {
+                try {
+                    if (typeof preload.decode === 'function') {
+                        await preload.decode();
+                    }
+                } catch (error) {
+                    // decode 失敗不代表圖片不能使用，直接採用已完成載入的圖片。
+                }
+
+                galleryFullImageCache.set(cacheKey, preload);
+
+                // 只有目前仍然在看同一張作品時才切換，避免快速點擊造成錯圖。
+                if (galleryImage.dataset.cacheKey === cacheKey) {
+                    galleryImage.src = preload.src;
+                    galleryImage.classList.remove('is-loading-full');
+                    galleryImage.classList.add('is-full-loaded');
+                }
+            };
+            preload.onerror = () => {
+                fullImageIndex += 1;
+                loadFullImage();
+            };
+            preload.src = fullImagePaths[fullImageIndex];
+        };
+
         loadFullImage();
-    };
+    }
 
-    loadFullImage();
+    galleryImage.dataset.cacheKey = cacheKey;
 
     galleryScale = 1;
     galleryOffsetX = 0;

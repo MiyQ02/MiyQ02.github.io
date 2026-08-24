@@ -516,6 +516,19 @@ body {
     max-height: 72vh;
     margin: 0 auto;
     object-fit: contain;
+    filter: none;
+    transition: filter 0.35s ease, opacity 0.2s ease;
+}
+
+/* 第一次開啟作品：先顯示已載入的縮圖，再由縮圖平順變清晰。 */
+#gallery-lightbox-img.is-loading-full {
+    filter: blur(10px);
+    transform: scale(1.015);
+}
+
+#gallery-lightbox-img.is-full-loaded {
+    filter: blur(0);
+    transform: scale(1);
 }
 
 .gallery-work-info {
@@ -581,6 +594,14 @@ body {
     width: auto;
     max-width: 90vw;
     max-height: 90vh;
+}
+
+.gallery-lightbox.zoom-active #gallery-lightbox-img.is-loading-full {
+    transform: scale(1.015);
+}
+
+.gallery-lightbox.zoom-active #gallery-lightbox-img.is-full-loaded {
+    transform: scale(1);
 }
 
 .gallery-lightbox.zoom-active .gallery-work-info {
