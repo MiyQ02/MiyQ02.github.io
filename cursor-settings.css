@@ -441,3 +441,27 @@
         max-height: none;
     }
 }
+
+/* ==========================================================
+   站內授權聲明頁尾（六頁共用，隨明暗主題）
+   ========================================================== */
+.site-license-footer {
+    margin-top: 28px;
+    padding: 16px 14px 24px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--text-muted, #777);
+    border-top: 1px solid var(--border);
+}
+
+.site-license-footer a {
+    color: var(--accent);
+    text-decoration: none;
+    margin-left: 6px;
+    white-space: nowrap;
+}
+
+.site-license-footer a:hover {
+    text-decoration: underline;
+}
