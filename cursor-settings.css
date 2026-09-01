@@ -1,0 +1,443 @@
+/* ==========================================================================
+   自訂游標切換（搭配 cursor-settings.js）
+   --------------------------------------------------------------------------
+   運作方式：
+   1. 8 組游標集的 --cur-* 變數全部「靜態展開」在本檔（見下方區塊），
+      桌機頁 head 的內联腳本於首幀前把 localStorage 的游標集寫進
+      <html data-cursor="角色/邊框">，于是游標從第一幀就是自訂，
+      不需要等 JS 執行後注入樣式（這正是「要移動滑鼠才顯示」的解法）。
+   2. 下方「狀態規則」用 var(--cur-xxx, 原生關鍵字) 決定哪個元素用哪個游標；
+      沒啟用自訂集時變數為空，自動退回原生游標。
+   3. Windows 正常情況下無法替換、且作者未製作 .cur 的四種狀態
+      （grab / grabbing / zoom-in / zoom-out）不套用自訂游標，維持原生。
+   ========================================================================== */
+
+/* --- 游標狀態規則（站方以 #id 宣告 cursor，故自訂游標用 !important 接管；
+       各狀態之間靠「選擇器 + source order」區分，同權重後者勝） --- */
+
+/* 整頁預設 → Normal.cur（body、卡片空白、背景等） */
+:root[data-cursor] {
+    cursor: var(--cur-normal, auto) !important;
+}
+
+/* 連結／按鈕等可點擊元素 → Link.cur */
+:root[data-cursor] :where(a[href], button, summary, select,
+    input[type="button"], input[type="submit"], input[type="reset"],
+    input[type="checkbox"], input[type="radio"], input[type="range"],
+    [role="button"], label) {
+    cursor: var(--cur-link, pointer) !important;
+}
+
+/* 文字輸入與可選取文字 → Text.cur（排在連結規則之後，同權重後者勝） */
+:root[data-cursor] :where(input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    textarea, [contenteditable],
+    p, li, td, th, h1, h2, h3, h4, h5, h6, figcaption) {
+    cursor: var(--cur-text, text) !important;
+}
+
+/* 無法操作 → Unavailable.cur */
+:root[data-cursor] :where([disabled], [aria-disabled="true"]) {
+    cursor: var(--cur-not-allowed, not-allowed) !important;
+}
+
+/* 「恢復預設游標」選項固定顯示系統游標（(0,3,0) 權重勝過上方 :where 規則） */
+:root[data-cursor] .cursor-option--default {
+    cursor: default !important;
+}
+
+/* 未列出的狀態（燈箱拖曳 grab/grabbing、縮圖放大 zoom-in 等）刻意保持原生：
+   作者未製作對應 .cur，且屬 Windows 正常情況無法替換的游標狀態。 */
+
+/* ==========================================================================
+   8 組游標集的靜態變數（新增游標集：放好 .cur 後比照加一個區塊）
+   ========================================================================== */
+
+:root[data-cursor="Chito/no_border"] {
+    --cur-normal: url("page_cursor/Chito/no_border/Normal.cur") 0 0, auto;
+    --cur-link: url("page_cursor/Chito/no_border/Link.cur") 0 0, pointer;
+    --cur-text: url("page_cursor/Chito/no_border/Text.cur") 9 11, text;
+    --cur-not-allowed: url("page_cursor/Chito/no_border/Unavailable.cur") 0 0, not-allowed;
+}
+
+:root[data-cursor="Chito/white_border"] {
+    --cur-normal: url("page_cursor/Chito/white_border/Normal.cur") 0 0, auto;
+    --cur-link: url("page_cursor/Chito/white_border/Link.cur") 0 0, pointer;
+    --cur-text: url("page_cursor/Chito/white_border/Text.cur") 9 11, text;
+    --cur-not-allowed: url("page_cursor/Chito/white_border/Unavailable.cur") 0 0, not-allowed;
+}
+
+:root[data-cursor="Yuuri/no_border"] {
+    --cur-normal: url("page_cursor/Yuuri/no_border/Normal.cur") 0 0, auto;
+    --cur-link: url("page_cursor/Yuuri/no_border/Link.cur") 0 0, pointer;
+    --cur-text: url("page_cursor/Yuuri/no_border/Text.cur") 9 11, text;
+    --cur-not-allowed: url("page_cursor/Yuuri/no_border/Unavailable.cur") 0 0, not-allowed;
+}
+
+:root[data-cursor="Yuuri/white_border"] {
+    --cur-normal: url("page_cursor/Yuuri/white_border/Normal.cur") 0 0, auto;
+    --cur-link: url("page_cursor/Yuuri/white_border/Link.cur") 0 0, pointer;
+    --cur-text: url("page_cursor/Yuuri/white_border/Text.cur") 9 11, text;
+    --cur-not-allowed: url("page_cursor/Yuuri/white_border/Unavailable.cur") 0 0, not-allowed;
+}
+
+:root[data-cursor="Shijima/no_border"] {
+    --cur-normal: url("page_cursor/Shijima/no_border/Normal.cur") 0 0, auto;
+    --cur-link: url("page_cursor/Shijima/no_border/Link.cur") 0 0, pointer;
+    --cur-text: url("page_cursor/Shijima/no_border/Text.cur") 9 11, text;
+    --cur-not-allowed: url("page_cursor/Shijima/no_border/Unavailable.cur") 0 0, not-allowed;
+}
+
+:root[data-cursor="Shijima/white_border"] {
+    --cur-normal: url("page_cursor/Shijima/white_border/Normal.cur") 0 0, auto;
+    --cur-link: url("page_cursor/Shijima/white_border/Link.cur") 0 0, pointer;
+    --cur-text: url("page_cursor/Shijima/white_border/Text.cur") 9 11, text;
+    --cur-not-allowed: url("page_cursor/Shijima/white_border/Unavailable.cur") 0 0, not-allowed;
+}
+
+:root[data-cursor="Majime/no_border"] {
+    --cur-normal: url("page_cursor/Majime/no_border/Normal.cur") 0 0, auto;
+    --cur-link: url("page_cursor/Majime/no_border/Link.cur") 0 0, pointer;
+    --cur-text: url("page_cursor/Majime/no_border/Text.cur") 9 11, text;
+    --cur-not-allowed: url("page_cursor/Majime/no_border/Unavailable.cur") 0 0, not-allowed;
+}
+
+:root[data-cursor="Majime/white_border"] {
+    --cur-normal: url("page_cursor/Majime/white_border/Normal.cur") 0 0, auto;
+    --cur-link: url("page_cursor/Majime/white_border/Link.cur") 0 0, pointer;
+    --cur-text: url("page_cursor/Majime/white_border/Text.cur") 9 11, text;
+    --cur-not-allowed: url("page_cursor/Majime/white_border/Unavailable.cur") 0 0, not-allowed;
+}
+/* ==========================================================================
+   navbar 最左邊的游標設定圖示
+   ========================================================================== */
+.navbar nav > :first-child {
+    grid-column: 1;
+    justify-self: start;
+}
+
+.cursor-settings-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: 1px solid var(--glass-border);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.cursor-settings-btn:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   游標設定彈窗
+   ========================================================================== */
+.cursor-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0s linear 0.25s;
+}
+
+.cursor-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.25s ease;
+}
+
+.cursor-modal-panel {
+    width: min(920px, 100%);
+    max-height: min(84vh, 720px);
+    overflow-y: auto;
+    background: var(--panel-strong);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 18px 44px var(--shadow);
+    padding: 22px 22px 18px;
+    transform: translateY(10px);
+    transition: transform 0.25s ease;
+}
+
+.cursor-modal.is-open .cursor-modal-panel {
+    transform: translateY(0);
+}
+
+.cursor-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.cursor-modal-title {
+    margin: 0;
+    font-size: 19px;
+    color: var(--text-main);
+}
+
+.cursor-modal-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--glass-bg);
+    color: var(--text-main);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+/* 兩欄大面板 body */
+.cursor-modal-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 22px;
+    align-items: start;
+}
+
+.cursor-col { min-width: 0; }
+
+.cursor-col--right {
+    border-left: 1px solid var(--border);
+    padding-left: 22px;
+}
+
+.cursor-col-title {
+    margin: 0 0 12px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+}
+
+.cursor-option-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 0;
+    margin: 0;
+}
+
+/* 角色分組標題：橫跨整排 */
+.cursor-option-group-label {
+    grid-column: 1 / -1;
+    margin-top: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-soft);
+}
+
+.cursor-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 11px 13px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--panel-bg);
+    color: var(--text-main);
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.cursor-option:hover {
+    border-color: var(--accent);
+}
+
+/* 「恢復預設」選項的空 swatch 放一個滑鼠圖示，避免視覺上像壞掉的空格 */
+.cursor-option-swatch--default {
+    display: grid;
+    place-items: center;
+    font-size: 14px;
+}
+
+.cursor-option-swatch--default::before {
+    content: "🖱️";
+}
+
+.cursor-option.is-selected {
+    border-color: var(--accent);
+    background: rgba(0, 162, 255, 0.12);
+}
+
+.cursor-option-swatch {
+    flex: 0 0 auto;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--swatch, transparent) center / contain no-repeat;
+    border: 1px solid var(--border);
+}
+
+.cursor-option-name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* 游標大小：預設 / 小 / 中 / 大 四按鈕（僅自訂集可用） */
+.cursor-size {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+}
+
+.cursor-size-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+.cursor-size-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.cursor-size-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 6px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--panel-bg);
+    color: var(--text-main);
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.cursor-size-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+}
+
+.cursor-size-btn.is-selected {
+    border-color: var(--accent);
+    background: rgba(0, 162, 255, 0.16);
+    color: var(--text-main);
+    font-weight: 700;
+}
+
+.cursor-size-hint {
+    margin: 8px 0 0;
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+
+/* 預設游標模式下整組大小控制停用 */
+.cursor-size.is-disabled .cursor-size-label,
+.cursor-size.is-disabled .cursor-size-hint {
+    opacity: 0.5;
+}
+
+.cursor-size-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.cursor-hint {
+    margin: 16px 0 0;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+
+/* 「恢復預設游標」橫跨左欄整排（兩格） */
+.cursor-option--default {
+    grid-column: 1 / -1;
+    justify-content: center;
+}
+
+/* 右欄 Cursor-Test 示範格 */
+.cursor-test-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    max-height: 520px;
+    overflow-y: auto;
+}
+
+/* 預設模式：未選游標時的單行提示，橫跨整欄置中 */
+.cursor-test-empty {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+    padding: 24px 12px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.cursor-test-tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--panel-bg);
+    font-size: 12px;
+    color: var(--text-soft);
+    user-select: none;
+    transition: border-color 0.2s ease;
+}
+
+.cursor-test-tile:hover {
+    border-color: var(--accent);
+    color: var(--text-main);
+}
+
+@media (max-width: 760px) {
+    .cursor-modal-panel {
+        width: 100%;
+        max-height: 84vh;
+        padding: 18px 16px 14px;
+    }
+
+    .cursor-modal-body {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .cursor-col--right {
+        border-left: 0;
+        padding-left: 0;
+        border-top: 1px solid var(--border);
+        padding-top: 16px;
+    }
+
+    .cursor-test-grid {
+        max-height: none;
+    }
+}

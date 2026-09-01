@@ -85,12 +85,54 @@
 })();
 </script>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="cursor-settings.css">
+    <script src="cursor-settings.js" defer></script>
+    <script>
+    // 首幀前套用游標集與已快取的縮放尺寸：自訂游標（含大小）從第一幀就生效
+    (function () {
+        try {
+            var s = localStorage.getItem('cursor-set');
+            if (!(s && s !== 'default' && /^(Chito|Yuuri|Shijima|Majime)\/(no_border|white_border)$/.test(s))) {
+                return;
+            }
+            document.documentElement.setAttribute('data-cursor', s);
+            var scale = parseInt(localStorage.getItem('cursor-scale'), 10);
+            // 對齊四檔（預設/小/中/大=100/125/150/200），夾住 200 上限
+            var CHOICES = [100, 125, 150, 200];
+            if (scale && scale !== 100) {
+                var bounded = Math.min(200, Math.max(100, scale));
+                var best = 100, bestDiff = Infinity;
+                for (var i = 0; i < CHOICES.length; i++) {
+                    var diff = Math.abs(bounded - CHOICES[i]);
+                    if (diff < bestDiff) { best = CHOICES[i]; bestDiff = diff; }
+                }
+                scale = best;
+            }
+            if (scale && scale !== 100) {
+                var cssCache = JSON.parse(localStorage.getItem('cursorCssCache') || '{}');
+                var css = cssCache[s + '|' + scale];
+                if (css) {
+                    var st = document.createElement('style');
+                    st.id = 'cursor-scale-style';
+                    st.textContent = css;
+                    document.head.appendChild(st);
+                }
+            }
+        } catch (e) { /* 無痕模式：跳過 */ }
+    })();
+    </script>
 </head>
 <body>
 
     <!-- 頂部導覽列 -->
     <header class="navbar">
         <nav>
+            <!-- 游標設定（靜態，避免 JS 注入造成 navbar 位移閃爍） -->
+            <button id="cursor-settings-btn" class="cursor-settings-btn" type="button"
+                    aria-haspopup="dialog" aria-expanded="false" aria-controls="cursor-settings-modal"
+                    title="游標設定">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
             <div class="nav-links">
                 <!-- 連結到各自的檔案，首頁目前是 active 狀態 -->
                 <a href="index.html" class="nav-item active" data-i18n="nav-home">首頁</a>
