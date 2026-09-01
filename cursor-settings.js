@@ -22,8 +22,8 @@
     /* ===== 儲存機制 ===== */
     const STORAGE_KEY = 'cursor-set';
     const SCALE_KEY = 'cursor-scale';
-    const IMG_CACHE_KEY = 'cursorImgCache';   /* { "set|scale|File": dataURL } */
-    const CSS_CACHE_KEY = 'cursorCssCache';   /* { "set|scale": 覆蓋用 CSS 字串 } */
+    const IMG_CACHE_KEY = 'cursorImgCacheV2';  /* 最近鄰版；換鍵讓舊平滑快取失效 */
+    const CSS_CACHE_KEY = 'cursorCssCacheV2';  /* 最近鄰版覆蓋樣式快取 */
     const DEFAULT_VALUE = 'default';
     const SCALE_MAX = 200;                        /* 最高 200%（更大瀏覽器顯示不了） */
     const CUR_BASE_PX = 64;                       /* .cur 內嵌圖為 64×64 */
@@ -238,9 +238,8 @@
                     canvas.height = size;
                     const ctx = canvas.getContext('2d');
                     ctx.clearRect(0, 0, size, size);
-                    ctx.imageSmoothingEnabled = true;
-                    ctx.imageSmoothingQuality = 'high';
-                    ctx.drawImage(img, 0, 0, size, size);
+                    ctx.imageSmoothingEnabled = false;   /* 最近鄰：硬邊鋸齒、不模糊 */
+                    ctx.drawImage(img, 0, 0, size, size);   /* imageSmoothingEnabled=false 套在 drawImage 前 */
                     dataUrl = canvas.toDataURL('image/png');
                 } catch (error) {
                     dataUrl = '';   /* 不透明來源或 canvas 受限：退回靜態檔案游標 */

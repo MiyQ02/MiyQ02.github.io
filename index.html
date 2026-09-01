@@ -109,7 +109,7 @@
                 scale = best;
             }
             if (scale && scale !== 100) {
-                var cssCache = JSON.parse(localStorage.getItem('cursorCssCache') || '{}');
+                var cssCache = JSON.parse(localStorage.getItem('cursorCssCacheV2') || '{}');
                 var css = cssCache[s + '|' + scale];
                 if (css) {
                     var st = document.createElement('style');
