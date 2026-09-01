@@ -43,7 +43,7 @@ Attribution—NonCommercial—NoDerivatives 4.0 (**CC BY-NC-ND 4.0**), **plus th
 ## 摘要 / TL;DR
 | 對象 | 授權 | 商業 | 改作 | AI 訓練 |
 |---|---|---|---|---|
-| 程式碼／排版 | MIT | ✅ 可 | ✅ 可 | ❌ 禁止 |
+| 程式碼／排版 | MIT | ✅ 可 | ✅ 可 | ✅ 可 |
 | 美術／插畫／游標／視覺 | CC BY-NC-ND 4.0 + No-AI-Training | ❌ | ❌ | ❌ |
 
 © 2026 **滅Q（MiyQ）**. Source code: MIT; artwork & visual assets: CC BY-NC-ND 4.0 (all rights otherwise reserved).
