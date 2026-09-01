@@ -1,45 +1,52 @@
 # 授權條款 / License
 
-本存放庫採**分層授權（dual-tier）**：美術素材與網站原始碼適用不同規則。
-This repository uses a **dual-tier** license: artwork and source code are covered by different terms.
+本存放庫採**分層授權**：**網站原始碼**與**美術／視覺素材**適用不同規則。
+This repository is **dual-licensed**: the source code and the artwork/visual assets follow different terms.
+
+作者 / Author：**滅Q（MiyQ）**
 
 ---
 
-## 1. 美術、插畫、游標圖檔等素材 / Artwork & cursor/image assets
+## 1. 網站原始碼 / Website source code（MIT）
 
-**適用路徑 / Applies to：** `img/`、`page_cursor/`（含所有 `.cur`、`.png` 等圖檔）
+**適用 / Applies to：** `.html`、`.css`、`.js` 等**程式碼與網頁排版結構**（不含第 2 節之美術、圖像、游標等素材）。
 
-**授權 / License：** 姓名標示—非商業性—禁止改作 4.0（**CC BY-NC-ND 4.0**）
-Attribution—NonCommercial—NoDerivatives 4.0 (**CC BY-NC-ND 4.0**)
+Released under the **MIT License**. 你可以自由地使用、複製、修改、合併、發布，甚至**用於商業專案**——歡迎參考或直接沿用本站的排版／程式結構。
+You may use, copy, modify, merge, publish and **use this code commercially**; reusing the page layout/structure is welcome.
 
-- ✅ 可以：在**清楚署名作者 `滅Q（MiyQ）` 並連結回本網站**的前提下，下載、**非商業**地分享，以及**個人使用**本素材。
-  You may download, **non-commercially** share, and use these works **privately / for personal use**, **with clear credit to `滅Q (MiyQ)` and a link back to this site**.
-- ❌ 不可以：**商業使用**；**改作、衍生**（改色、裁切、變形、放進你自己的作品或產品）；移除或隱匿本聲明。
-  You may **not** use these works commercially, **adapt or create derivatives** (recolor, crop, remix, embed into your own works/products), or remove this notice.
+唯一條件：請保留本授權與版權聲明，並**將內容與圖檔替換成你自己的**（本站的美術與素材不在此授權範圍，見第 2 節）。
+The only asks: keep this copyright/permission notice, and **replace the text and images with your own** — the artwork below is not covered by the MIT grant.
+
+> The MIT License (MIT)
+> Copyright (c) 2026 滅Q (MiyQ)
+> Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated source files, to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, subject to the conditions in this LICENSE file. The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
+## 2. 美術、插畫、游標與多媒體資產 / Artwork, illustrations, cursors & media
+
+**適用 / Applies to：** `img/`、`page_cursor/`（所有 `.cur`、`.png` 等），以及**本站的原創視覺／UI 設計**。
+
+**授權 / License：** 姓名標示—非商業性—禁止改作 4.0（**CC BY-NC-ND 4.0**），並附加以下條款：
+Attribution—NonCommercial—NoDerivatives 4.0 (**CC BY-NC-ND 4.0**), **plus the additional conditions below**:
+
+- ✅ 可以：在**清楚署名 `滅Q（MiyQ）` 並連結回本網站**的前提下，**非商業**地分享，以及**個人使用**。
+  You may share and use these works **privately / non-commercially, with clear credit to `滅Q (MiyQ)` and a link back**.
+- ❌ 不可以：**商業使用**；**改作／衍生**（改色、裁切、變形、嵌入你自己的作品或產品）。
+  **No commercial use; no adaptation or derivatives** (recolor, crop, remix, embed into your own works/products).
+- ❌ **禁止 AI 訓練**：不得將本節素材（或整站內容）**擷取作為 AI / 機器學習模型的訓練資料**。
+  **No AI training:** these works (and the site's content) may **not** be collected or used as training data for AI / machine-learning models.
 - 完整條文 / Legal code：https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode
 - 中文摘要 / Deed：https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh-hant
 
-## 2. 網站原始碼 / Website source code
-
-**適用路徑 / Applies to：** `.html`、`.css`、`.js` 等所有程式碼。
-
-**狀態 / Status：** 保留所有權利（**All Rights Reserved**），僅**公開供閱覽（source-available）**。本專案**並非**以 MIT／GPL 等開放原始碼授權釋出。
-All Rights Reserved; the code is **source-available only**. It is **not** released under an OSI open-source license such as MIT or GPL.
-
-- ✅ 可以：閱讀、學習、參考，並依 GitHub 服務條款在本平台查看／fork。
-  You may read, study and reference the code, and view/fork it on GitHub under GitHub's Terms of Service.
-- ❌ 未經作者 `滅Q（MiyQ）` **書面同意，不得**：將原始碼複製／重製到你自己的網站或專案、再散布、修改後散布，或將其（或其任何一部分）納入任何產品（無論是否商業）。
-  **Without written permission from the author,** you may **not** copy or reproduce the code into your own sites/projects, redistribute it, publish modified versions, or include it (or any part of it) in any product (commercial or not).
-- 白話：**能看、能參考、能學習；不能整個照抄拿去用。**
-  In short: **reading, learning and referencing are fine; wholesale copying is not.**
-
 ---
 
-## 聯絡 / Contact
-使用授權、素材商業合作、或任何超出上述範圍的需求，請透過 GitHub Issues 提出。
-For permissions beyond these terms (e.g. commercial use of the artwork), open a GitHub issue.
+## 摘要 / TL;DR
+| 對象 | 授權 | 商業 | 改作 | AI 訓練 |
+|---|---|---|---|---|
+| 程式碼／排版 | MIT | ✅ 可 | ✅ 可 | ❌ 禁止 |
+| 美術／插畫／游標／視覺 | CC BY-NC-ND 4.0 + No-AI-Training | ❌ | ❌ | ❌ |
 
-© 2026 **滅Q（MiyQ）**. Artwork licensed under CC BY-NC-ND 4.0; source code All Rights Reserved.
+© 2026 **滅Q（MiyQ）**. Source code: MIT; artwork & visual assets: CC BY-NC-ND 4.0 (all rights otherwise reserved).
 
 > 提醒 / Note：本檔為權利聲明，不構成律師意見；大規模維權前建議諮詢專業法律意見。
 > This file is a rights notice, not legal advice.
