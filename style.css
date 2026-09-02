@@ -1347,6 +1347,11 @@ body.manga-reading {
     margin: 10px 0 6px;
 }
 
+/* 下載頁卡片：標籤靠左（與標題／按鈕一致）；彈窗維持置中 */
+.dl-card .work-tags {
+    justify-content: flex-start;
+}
+
 .work-tags span {
     padding: 3px 9px;
     border: 1px solid var(--border);

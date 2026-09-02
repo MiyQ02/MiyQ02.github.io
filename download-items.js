@@ -5,7 +5,8 @@
  *
  * 資源清單在本檔案上方維護，之後新增資源（桌布等）只需：
  *   1. 在 DL_ITEMS 追加一筆物件
- *   2. preview 放 ./img/download/ 下的展示圖
+ *   2. preview 放 ./img/download/ 的原圖；thumb 放 ./img/download/thumbs/
+ *      的同名縮圖（寬 ≤600px，卡片載 thumb、燈箱載 preview）
  *   3. links.win / links.linux 的下載網址由作者填入
  *      （目前為 '#' 佔位，點擊不會跳頁）
  *
@@ -17,8 +18,9 @@ window.DL_ITEMS = [
     {
         id: 'cursor-chito',
         category: 'cursor',
-        updated: '2025-08-31',
+        updated: '2025-09-21',
         preview: './img/download/cursor-chito.png',
+        thumb: './img/download/thumbs/cursor-chito.png',
         name: { 'zh-TW': '千都游標', en: 'Chito Desktop Cursor', ja: 'チト デスクトップカーソル' },
         desc: {
             'zh-TW': '少女終末旅行 千都造型桌面游標，含白邊／無白邊兩種版本、17 種狀態、64×64 解析度。',
@@ -27,15 +29,16 @@ window.DL_ITEMS = [
         },
         tags: ['少女終末旅行|Girls’ Last Tour|少女終末旅行', '千都|Chito|チト', '游標|Cursor|カーソル'],
         links: {
-            win: '#',    // TODO：Windows 版下載連結（由作者填入）
+            win: 'https://mega.nz/file/WxARmY6A#VIhM8LY2axuQGiR3r-HiKAjH61Zk3G0uhP3RP3XZxaM',    // TODO：Windows 版下載連結（由作者填入）
             linux: '#'   // TODO：Linux 版下載連結（由作者填入）
         }
     },
     {
         id: 'cursor-yuuri',
         category: 'cursor',
-        updated: '2025-08-31',
+        updated: '2025-06-26',
         preview: './img/download/cursor-yuuri.png',
+        thumb: './img/download/thumbs/cursor-yuuri.png',
         name: { 'zh-TW': '尤莉游標', en: 'Yuuri Desktop Cursor', ja: 'ユーリ デスクトップカーソル' },
         desc: {
             'zh-TW': '少女終末旅行 尤莉造型桌面游標，含白邊／無白邊兩種版本、17 種狀態、64×64 解析度。',
@@ -44,15 +47,16 @@ window.DL_ITEMS = [
         },
         tags: ['少女終末旅行|Girls’ Last Tour|少女終末旅行', '尤莉|Yuuri|ユーリ', '游標|Cursor|カーソル'],
         links: {
-            win: '#',    // TODO：Windows 版下載連結（由作者填入）
+            win: 'https://mega.nz/file/KkxmDTiA#EtE34fOuiELy-VFTVOZQdbO_CIPSTouUguW3brsq2N4',    // TODO：Windows 版下載連結（由作者填入）
             linux: '#'   // TODO：Linux 版下載連結（由作者填入）
         }
     },
     {
         id: 'cursor-shijima',
         category: 'cursor',
-        updated: '2025-08-31',
+        updated: '2026-03-07',
         preview: './img/download/cursor-shijima.jpg',
+        thumb: './img/download/thumbs/cursor-shijima.jpg',
         name: { 'zh-TW': '月島靜寂游標', en: 'Tsukishima Shizuka Desktop Cursor', ja: '月島しじま デスクトップカーソル' },
         desc: {
             'zh-TW': '蘑菇的擬態日常 月島靜寂造型桌面游標，含白邊／無白邊兩種版本、17 種狀態、64×64 解析度。',
@@ -61,15 +65,16 @@ window.DL_ITEMS = [
         },
         tags: ['蘑菇的擬態日常|Shimeji Simulation|シメジ シミュレーション', '月島靜寂|Tsukishima Shizuka|月島しじま', '游標|Cursor|カーソル'],
         links: {
-            win: '#',    // TODO：Windows 版下載連結（由作者填入）
+            win: 'https://mega.nz/file/bhZXARSC#tGk-G8Kq2ZIa6MqzMAeHUTBM3uHIEZd8Ute3-u_vni8',    // TODO：Windows 版下載連結（由作者填入）
             linux: '#'   // TODO：Linux 版下載連結（由作者填入）
         }
     },
     {
         id: 'cursor-majime',
         category: 'cursor',
-        updated: '2025-08-31',
+        updated: '2026-04-11',
         preview: './img/download/cursor-majime.jpg',
+        thumb: './img/download/thumbs/cursor-majime.jpg',
         name: { 'zh-TW': '山下真面目游標', en: 'Yamashita Majime Desktop Cursor', ja: '山下まじめ デスクトップカーソル' },
         desc: {
             'zh-TW': '蘑菇的擬態日常 山下真面目造型桌面游標，含白邊／無白邊兩種版本、17 種狀態、64×64 解析度。',
@@ -78,7 +83,7 @@ window.DL_ITEMS = [
         },
         tags: ['蘑菇的擬態日常|Shimeji Simulation|シメジ シミュレーション', '山下真面目|Yamashita Majime|山下まじめ', '游標|Cursor|カーソル'],
         links: {
-            win: '#',    // TODO：Windows 版下載連結（由作者填入）
+            win: 'https://mega.nz/file/3hIRXYID#7awBLiscGnHOVopvHE2s8vXhCkPMwodQ6De6uWN7Zow',    // TODO：Windows 版下載連結（由作者填入）
             linux: '#'   // TODO：Linux 版下載連結（由作者填入）
         }
     }
@@ -314,7 +319,7 @@ window.DL_CATEGORIES = [
         media.className = 'dl-card-media';
         media.title = t('dl-zoom');
         const img = document.createElement('img');
-        img.src = item.preview;
+        img.src = item.thumb || item.preview;
         img.alt = item.name[dlLang] || item.name['zh-TW'];
         img.loading = 'lazy';
         media.appendChild(img);
