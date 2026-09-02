@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <link rel="icon" href="./img/other/favicon.ico" type="image/x-icon">
+    <title data-i18n="title">滅Q - 漫畫</title>
+
+    <style>
+        html.language-loading body {
+            visibility: hidden;
+        }
+    </style>
+
+    <script>
+    (function () {
+        const lang = localStorage.getItem('lang');
+
+        if (lang === 'en' || lang === 'ja') {
+            document.documentElement.classList.add('language-loading');
+        }
+    })();
+    </script>
+
+    <!-- 鎖定防閃爍（Anti-Flicker）的內聯腳本，在所有上載的資源加載前執行 -->
+    <script>
+        (function() {
+            // 優先讀取 localStorage 的主題設定，其次依賴系統偏好
+            let themeClass = localStorage.getItem('theme');
+
+            if (!themeClass) {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                themeClass = prefersDark ? 'dark-theme' : 'light-theme';
+            } else {
+                themeClass = themeClass === 'dark' ? 'dark-theme' : 'light-theme';
+            }
+
+            // 立即應用到 <html> 元素，在瀏覽器渲染之前完成
+            document.documentElement.classList.add(themeClass);
+        })();
+    </script>
+
+<script>
+(function () {
+    const currentName = location.pathname.split('/').pop() || 'manga.html';
+    const isMobilePage = currentName.endsWith('_mobile.html');
+
+    const desktopToMobile = {
+        'index.html': 'index_mobile.html',
+        'gallery.html': 'gallery_mobile.html',
+        'manga.html': 'manga_mobile.html',
+        'about.html': 'about_mobile.html',
+        'ui.html': 'ui_mobile.html'
+    };
+
+    const mobileToDesktop = {
+        'index_mobile.html': 'index.html',
+        'gallery_mobile.html': 'gallery.html',
+        'manga_mobile.html': 'manga.html',
+        'about_mobile.html': 'about.html',
+        'ui_mobile.html': 'ui.html'
+    };
+
+    function syncPageByViewport() {
+        const isMobileViewport =
+            window.matchMedia('(max-width: 760px)').matches;
+
+        const target = isMobileViewport
+            ? desktopToMobile[currentName]
+            : mobileToDesktop[currentName];
+
+        if (target && (isMobileViewport !== isMobilePage)) {
+            location.replace(target);
+        }
+    }
+
+    syncPageByViewport();
+
+    const mediaQuery = window.matchMedia('(max-width: 760px)');
+
+    if (mediaQuery.addEventListener) {
+        mediaQuery.addEventListener('change', syncPageByViewport);
+    } else {
+        mediaQuery.addListener(syncPageByViewport);
+    }
+})();
+</script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="cursor-settings.css">
+    <script src="cursor-settings.js" defer></script>
+    <script src="labels.js" defer></script>
+    <script>
+    // 首幀前套用游標集與已快取的縮放尺寸：自訂游標（含大小）從第一幀就生效
+    (function () {
+        try {
+            var s = localStorage.getItem('cursor-set');
+            if (!(s && s !== 'default' && /^(Chito|Yuuri|Shijima|Majime)\/(no_border|white_border)$/.test(s))) {
+                return;
+            }
+            document.documentElement.setAttribute('data-cursor', s);
+            var scale = parseInt(localStorage.getItem('cursor-scale'), 10);
+            var CHOICES = [100, 125, 150, 200];
+            if (scale && scale !== 100) {
+                var bounded = Math.min(200, Math.max(100, scale));
+                var best = 100, bestDiff = Infinity;
+                for (var i = 0; i < CHOICES.length; i++) {
+                    var diff = Math.abs(bounded - CHOICES[i]);
+                    if (diff < bestDiff) { best = CHOICES[i]; bestDiff = diff; }
+                }
+                scale = best;
+            }
+            if (scale && scale !== 100) {
+                var cssCache = JSON.parse(localStorage.getItem('cursorCssCacheV2') || '{}');
+                var css = cssCache[s + '|' + scale];
+                if (css) {
+                    var st = document.createElement('style');
+                    st.id = 'cursor-scale-style';
+                    st.textContent = css;
+                    document.head.appendChild(st);
+                }
+            }
+        } catch (e) { /* 無痕模式：跳過 */ }
+    })();
+    </script>
+</head>
+<body>
+
+    <!-- 頂部導覽列 -->
+    <header class="navbar">
+        <nav>
+            <!-- 游標設定（靜態，避免 JS 注入造成 navbar 位移閃爍） -->
+            <button id="cursor-settings-btn" class="cursor-settings-btn" type="button"
+                    aria-haspopup="dialog" aria-expanded="false" aria-controls="cursor-settings-modal"
+                    title="游標設定">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span class="cursor-settings-label" data-i18n="cursor-settings">游標設定</span>
+            </button>
+            <div class="nav-links">
+                <a href="index.html" class="nav-item" data-i18n="nav-home">首頁</a>
+                <a href="gallery.html" class="nav-item" data-i18n="nav-gallery">繪畫</a>
+                <!-- 漫畫目前是 active 狀態 -->
+                <a href="manga.html" class="nav-item active" data-i18n="nav-manga">漫畫</a>
+                <a href="ui.html" class="nav-item" data-i18n="nav-ui">下載</a>
+                <a href="about.html" class="nav-item" data-i18n="nav-about">關於</a>
+            </div>
+
+            <div class="nav-controls" aria-label="語言與主題設定">
+                <div class="lang-select-wrap">
+                    <select id="lang-select" aria-label="語言切換">
+                        <option value="zh-TW">中文（台灣）</option>
+                        <option value="en">English</option>
+                        <option value="ja">日本語</option>
+                    </select>
+                </div>
+                <button id="theme-toggle" type="button" aria-label="切換黑夜模式">🌙</button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="mobile-controls" aria-label="手機版語言與主題設定">
+        <div class="nav-controls">
+            <div class="lang-select-wrap">
+                <select id="lang-select-mobile" aria-label="手機語言切換">
+                    <option value="zh-TW">中文（台灣）</option>
+                    <option value="en">English</option>
+                    <option value="ja">日本語</option>
+                </select>
+            </div>
+            <button id="theme-toggle-mobile" type="button" aria-label="切換黑夜模式">🌙</button>
+        </div>
+    </div>
+
+    <main class="content-container manga-container">
+        <section class="manga-section" aria-labelledby="manga-short-title">
+            <h2 class="manga-section-title" id="manga-short-title" data-i18n="manga-short">短篇</h2>
+            <div class="manga-work-grid" id="manga-short-grid"></div>
+            <div class="manga-empty" id="manga-short-empty" hidden data-i18n="manga-empty">敬請期待</div>
+        </section>
+
+        <section class="manga-section" aria-labelledby="manga-long-title">
+            <h2 class="manga-section-title" id="manga-long-title" data-i18n="manga-long">長篇</h2>
+            <div class="manga-work-grid" id="manga-long-grid"></div>
+            <div class="manga-empty" id="manga-long-empty" hidden data-i18n="manga-empty">敬請期待</div>
+        </section>
+    </main>
+
+    <!-- 漫畫閱讀器（全螢幕燈箱） -->
+    <div id="manga-overlay" class="manga-overlay" role="dialog" aria-modal="true" aria-label="漫畫閱讀">
+        <div class="manga-hud">
+            <button id="manga-close" class="manga-hud-btn" type="button" data-i18n="manga-back">返回</button>
+            <span id="manga-title" class="manga-hud-title"></span>
+            <span id="manga-page-indicator" class="manga-page-indicator"></span>
+        </div>
+        <div class="manga-stage" id="manga-stage">
+            <img id="manga-page-img" class="manga-page-img" src="" alt="漫畫頁面">
+            <button id="manga-zone-left" class="manga-zone manga-zone--left" type="button" aria-label="上一頁"></button>
+            <button id="manga-zone-right" class="manga-zone manga-zone--right" type="button" aria-label="下一頁"></button>
+            <div class="manga-hint" data-i18n="manga-hint">點擊左右兩側或使用 ← → 翻頁</div>
+        </div>
+    </div>
+
+    <!-- 站內授權聲明；語言切換由 i18n 接管 -->
+    <footer class="site-license-footer">
+        <span data-i18n="license-note">網站原始碼採 MIT 授權（可自由使用、修改與商業利用，歡迎參考排版結構，但請改以自己的內容與圖檔）；美術、插畫、漫画等作品與本站視覺設計 © 滅Q（MiyQ），依 CC BY-NC-ND 4.0 授權（須署名、禁止商業使用與改作），並禁止作為 AI 模型訓練資料。</span>
+        <a href="LICENSE.md" data-i18n="license-link">授權條款</a>
+    </footer>
+
+</body>
+
+<script>
+const themeToggle = document.getElementById('theme-toggle');
+const themeToggleMobile = document.getElementById('theme-toggle-mobile');
+const langSelect = document.getElementById('lang-select');
+const langSelectMobile = document.getElementById('lang-select-mobile');
+
+const themeButtons = [themeToggle, themeToggleMobile].filter(Boolean);
+const languageSelects = [langSelect, langSelectMobile].filter(Boolean);
+
+// 加入鎖定變數，防止兩個下拉選單互相影響、陷入無限重複觸發
+let isSyncingLanguage = false;
+
+function applyStoredTheme(themeName) {
+    const isDark = themeName === 'dark';
+    const themeClass = isDark ? 'dark-theme' : 'light-theme';
+
+    document.documentElement.classList.remove('light-theme', 'dark-theme');
+    document.documentElement.classList.add(themeClass);
+    document.body.classList.toggle('dark-theme', isDark);
+
+    themeButtons.forEach((button) => {
+        button.textContent = isDark ? '☀️' : '🌙';
+        button.setAttribute('aria-label', isDark ? '切換為白天模式' : '切換為黑夜模式');
+    });
+}
+
+function applyStoredLanguage(languageCode) {
+    const normalized = ['en', 'ja'].includes(languageCode) ? languageCode : 'zh-TW';
+    const selectedFlag = normalized === 'en' ? './img/other/USA.svg' : normalized === 'ja' ? './img/other/JP.svg' : './img/other/TW.svg';
+
+    document.documentElement.style.setProperty('--lang-flag-url', `url("${selectedFlag}")`);
+
+    languageSelects.forEach((select) => {
+        if (select && select.value !== normalized) {
+            select.value = normalized;
+        }
+    });
+
+    if (typeof updatePageLanguage === 'function') {
+        updatePageLanguage(normalized);
+    }
+}
+
+function syncGlobalControls() {
+    try {
+        let savedTheme = localStorage.getItem('theme');
+        if (!savedTheme) {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            savedTheme = prefersDark ? 'dark' : 'light';
+        }
+
+        const savedLanguage = localStorage.getItem('lang') || 'zh-TW';
+        applyStoredTheme(savedTheme);
+        applyStoredLanguage(savedLanguage);
+    } catch (error) {
+        applyStoredTheme('light');
+        applyStoredLanguage('zh-TW');
+    }
+}
+
+themeButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+        const nextTheme = document.documentElement.classList.contains('dark-theme') ? 'light' : 'dark';
+        try {
+            localStorage.setItem('theme', nextTheme);
+        } catch (error) {
+            // 忽略儲存失敗
+        }
+        applyStoredTheme(nextTheme);
+    });
+});
+
+languageSelects.forEach((select) => {
+    select.addEventListener('change', (event) => {
+        if (isSyncingLanguage) return;
+
+        isSyncingLanguage = true;
+        const nextLanguage = ['en', 'ja'].includes(event.target.value) ? event.target.value : 'zh-TW';
+
+        try {
+            localStorage.setItem('lang', nextLanguage);
+        } catch (error) {
+            // 忽略儲存失敗
+        }
+
+        applyStoredLanguage(nextLanguage);
+        isSyncingLanguage = false;
+    });
+});
+
+document.addEventListener('DOMContentLoaded', syncGlobalControls);
+</script>
+
+<script>
+/* ==========================================================
+ *  漫畫資料表（靜態站無法列目錄，作品以這裡為準）
+ *  檔案位置：img/manga/{type}/{lang}/{work}/{page}.{ext}
+ *  type：short（短篇）/ long（長篇）；page 由 1 起算
+ * ========================================================== */
+const MANGA_LIBRARY = {
+    short: {
+        'zh-TW': [
+            { id: '500', title: '500', pages: 4, ext: 'jpg' }
+        ],
+        en: [],
+        ja: []
+    },
+    // 長篇：語言 → 作品 → 章節 兩層結構
+    // 對應目錄 img/manga/long/{lang}/{作品}/{章節}/{1,2,3...}.{jpg|png|webp}
+    long: {
+        'zh-TW': {
+            K: {
+                // 空示範章節：沒有頁面 → 章節清單顯示「準備中」且不可點入
+                cheaper_1: { pages: 0, ext: 'jpg' }
+            }
+        },
+        en: {},
+        ja: {}
+    }
+};
+
+let mangaCurrentLang = 'zh-TW';
+
+/* ---------------- 列表渲染 ---------------- */
+function mangaPageUrl(basePath, ext, page) {
+    return `./img/manga/${basePath}/${page}.${ext}`;
+}
+
+/* 長篇作品封面：取第一個有頁面的章節的第 1 頁 */
+function mangaSeriesCover(lang, workId, chapters) {
+    for (const chId of Object.keys(chapters)) {
+        const ch = chapters[chId];
+        if (ch.pages > 0) {
+            return mangaPageUrl(`long/${lang}/${workId}/${chId}`, ch.ext, 1);
+        }
+    }
+    return null;
+}
+
+function makeWorkCard() {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'manga-work-card';
+
+    const cover = document.createElement('div');
+    cover.className = 'manga-work-cover';
+
+    const meta = document.createElement('div');
+    meta.className = 'manga-work-meta';
+
+    const title = document.createElement('div');
+    title.className = 'manga-work-title';
+
+    const count = document.createElement('div');
+    count.className = 'manga-work-count';
+
+    meta.appendChild(title);
+    meta.appendChild(count);
+    card.appendChild(cover);
+    card.appendChild(meta);
+
+    return { card, cover, title, count };
+}
+
+function renderShortWorks(grid, empty, lang) {
+    const works = (MANGA_LIBRARY.short && MANGA_LIBRARY.short[lang]) || [];
+    grid.innerHTML = '';
+
+    if (!works.length) {
+        empty.hidden = false;
+        return;
+    }
+
+    empty.hidden = true;
+
+    works.forEach((work) => {
+        const { card, cover, title, count } = makeWorkCard();
+
+        title.textContent = work.title;
+        count.textContent = `${work.pages} ${i18nData[lang]['manga-pages-unit']}`;
+
+        const img = document.createElement('img');
+        img.src = mangaPageUrl(`short/${lang}/${work.id}`, work.ext, 1);
+        img.alt = work.title;
+        img.loading = 'lazy';
+        cover.appendChild(img);
+
+        card.addEventListener('click', () => {
+            openMangaReader({
+                title: work.title,
+                basePath: `short/${lang}/${work.id}`,
+                pages: work.pages,
+                ext: work.ext,
+                lang,
+                progressKey: `manga-progress:short/${lang}/${work.id}`
+            });
+        });
+
+        grid.appendChild(card);
+    });
+}
+
+function renderLongWorks(grid, empty, lang) {
+    const seriesMap = (MANGA_LIBRARY.long && MANGA_LIBRARY.long[lang]) || {};
+    const workIds = Object.keys(seriesMap);
+    grid.innerHTML = '';
+
+    if (!workIds.length) {
+        empty.hidden = false;
+        return;
+    }
+
+    empty.hidden = true;
+
+    workIds.forEach((workId) => {
+        const chapters = seriesMap[workId];
+        const chapterIds = Object.keys(chapters);
+
+        const { card, cover, title, count } = makeWorkCard();
+
+        title.textContent = workId;
+        count.textContent = `${chapterIds.length} ${i18nData[lang]['manga-chapters-unit']}`;
+
+        const coverUrl = mangaSeriesCover(lang, workId, chapters);
+        if (coverUrl) {
+            const img = document.createElement('img');
+            img.src = coverUrl;
+            img.alt = workId;
+            img.loading = 'lazy';
+            cover.appendChild(img);
+        } else {
+            const placeholder = document.createElement('span');
+            placeholder.className = 'manga-cover-placeholder';
+            placeholder.textContent = i18nData[lang]['manga-preparing'];
+            cover.appendChild(placeholder);
+        }
+
+        // 章節清單面板：插入同一 grid，橫跨整列，點作品卡片展開／收合
+        const panel = document.createElement('div');
+        panel.className = 'manga-chapter-panel';
+        panel.hidden = true;
+
+        const panelTitle = document.createElement('h3');
+        panelTitle.className = 'manga-chapter-panel-title';
+        panelTitle.textContent = `${workId} · ${i18nData[lang]['manga-chapters']}`;
+        panel.appendChild(panelTitle);
+
+        chapterIds.forEach((chId) => {
+            const ch = chapters[chId];
+
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'manga-chapter-item';
+
+            if (ch.pages === 0) {
+                item.classList.add('is-disabled');
+                item.setAttribute('aria-disabled', 'true');
+            }
+
+            const name = document.createElement('span');
+            name.className = 'manga-chapter-name';
+            name.textContent = chId;
+
+            const pages = document.createElement('span');
+            pages.className = 'manga-chapter-pages';
+            pages.textContent = ch.pages > 0
+                ? `${ch.pages} ${i18nData[lang]['manga-pages-unit']}`
+                : i18nData[lang]['manga-preparing'];
+
+            item.appendChild(name);
+            item.appendChild(pages);
+
+            item.addEventListener('click', () => {
+                if (ch.pages === 0) return;
+
+                openMangaReader({
+                    title: `${workId} · ${chId}`,
+                    basePath: `long/${lang}/${workId}/${chId}`,
+                    pages: ch.pages,
+                    ext: ch.ext,
+                    lang,
+                    progressKey: `manga-progress:long/${lang}/${workId}/${chId}`
+                });
+            });
+
+            panel.appendChild(item);
+        });
+
+        card.addEventListener('click', () => {
+            const willOpen = panel.hidden;
+            panel.hidden = !willOpen;
+            card.classList.toggle('is-expanded', willOpen);
+
+            if (willOpen) {
+                panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+        });
+
+        grid.appendChild(card);
+        grid.appendChild(panel);
+    });
+}
+
+function renderMangaList(lang) {
+    mangaCurrentLang = lang;
+    renderShortWorks(
+        document.getElementById('manga-short-grid'),
+        document.getElementById('manga-short-empty'),
+        lang
+    );
+    renderLongWorks(
+        document.getElementById('manga-long-grid'),
+        document.getElementById('manga-long-empty'),
+        lang
+    );
+}
+
+
+/* ---------------- 閱讀器狀態 ---------------- */
+const mangaOverlay = document.getElementById('manga-overlay');
+const mangaStage = document.getElementById('manga-stage');
+const mangaPageImg = document.getElementById('manga-page-img');
+const mangaTitleEl = document.getElementById('manga-title');
+const mangaIndicator = document.getElementById('manga-page-indicator');
+const mangaCloseBtn = document.getElementById('manga-close');
+const mangaZoneLeft = document.getElementById('manga-zone-left');
+const mangaZoneRight = document.getElementById('manga-zone-right');
+
+// { title, basePath, pages, ext, lang, progressKey, page }
+let mangaReader = null;
+
+function loadMangaProgress(reader) {
+    try {
+        const saved = parseInt(localStorage.getItem(reader.progressKey), 10);
+        if (Number.isFinite(saved) && saved >= 1 && saved <= reader.pages) {
+            return saved;
+        }
+    } catch (error) {
+        // 忽略讀取失敗
+    }
+    return 1;
+}
+
+function saveMangaProgress() {
+    if (!mangaReader) return;
+    try {
+        localStorage.setItem(mangaReader.progressKey, String(mangaReader.page));
+    } catch (error) {
+        // 忽略儲存失敗
+    }
+}
+
+function openMangaReader(config) {
+    mangaReader = Object.assign({ page: 1 }, config);
+    mangaReader.page = loadMangaProgress(mangaReader);
+
+    mangaTitleEl.textContent = config.title;
+    mangaOverlay.classList.add('is-open');
+    document.body.classList.add('manga-reading');
+
+    showMangaPage();
+
+    if (mangaReader.page > 1) {
+        showMangaResumeChip(mangaReader.page);
+    }
+}
+
+function closeMangaReader() {
+    mangaReader = null;
+    mangaOverlay.classList.remove('is-open');
+    document.body.classList.remove('manga-reading');
+    mangaPageImg.src = '';
+}
+
+function showMangaPage() {
+    if (!mangaReader) return;
+
+    const { basePath, ext, page, pages } = mangaReader;
+
+    mangaPageImg.classList.add('is-loading');
+    mangaPageImg.src = mangaPageUrl(basePath, ext, page);
+    mangaPageImg.alt = `${mangaReader.title} ${page}`;
+    mangaIndicator.textContent = `${page} / ${pages}`;
+
+    saveMangaProgress();
+}
+
+mangaPageImg.addEventListener('load', () => {
+    mangaPageImg.classList.remove('is-loading');
+});
+
+mangaPageImg.addEventListener('error', () => {
+    mangaPageImg.classList.remove('is-loading');
+});
+
+function mangaGoTo(page) {
+    if (!mangaReader) return;
+
+    const clamped = Math.min(Math.max(page, 1), mangaReader.pages);
+
+    // 第一頁點左、最後一頁點右：頁碼不變（不越界）
+    if (clamped === mangaReader.page) return;
+
+    mangaReader.page = clamped;
+    showMangaPage();
+}
+
+function mangaNext() {
+    if (mangaReader) mangaGoTo(mangaReader.page + 1);
+}
+
+function mangaPrev() {
+    if (mangaReader) mangaGoTo(mangaReader.page - 1);
+}
+
+/* 區塊點擊翻頁（電腦與手機共用；滑動手勢在 touchend 處理） */
+mangaZoneRight.addEventListener('click', mangaNext);
+mangaZoneLeft.addEventListener('click', mangaPrev);
+mangaCloseBtn.addEventListener('click', closeMangaReader);
+
+/* 鍵盤：← → 翻頁、Esc 返回列表 */
+document.addEventListener('keydown', (event) => {
+    if (!mangaReader) return;
+
+    if (event.key === 'ArrowRight' || event.key === 'PageDown') {
+        event.preventDefault();
+        mangaNext();
+    } else if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
+        event.preventDefault();
+        mangaPrev();
+    } else if (event.key === 'Escape') {
+        closeMangaReader();
+    }
+});
+
+/* 滾輪翻頁（電腦，帶節流避免一次滾動跳多頁） */
+let mangaWheelLock = false;
+
+mangaStage.addEventListener('wheel', (event) => {
+    if (!mangaReader) return;
+
+    event.preventDefault();
+
+    if (mangaWheelLock || Math.abs(event.deltaY) < 4) return;
+    mangaWheelLock = true;
+
+    if (event.deltaY > 0) {
+        mangaNext();
+    } else {
+        mangaPrev();
+    }
+
+    setTimeout(() => { mangaWheelLock = false; }, 260);
+}, { passive: false });
+
+/* 觸控滑動：左滑下一頁、右滑上一頁；純點擊交給熱區 click */
+let mangaTouchStartX = 0;
+let mangaTouchStartY = 0;
+let mangaTouchIsSwipe = false;
+
+mangaStage.addEventListener('touchstart', (event) => {
+    if (event.touches.length !== 1) return;
+    mangaTouchStartX = event.touches[0].clientX;
+    mangaTouchStartY = event.touches[0].clientY;
+    mangaTouchIsSwipe = false;
+}, { passive: true });
+
+mangaStage.addEventListener('touchmove', (event) => {
+    if (event.touches.length !== 1 || mangaTouchIsSwipe) return;
+
+    const deltaX = event.touches[0].clientX - mangaTouchStartX;
+    const deltaY = event.touches[0].clientY - mangaTouchStartY;
+
+    if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+        mangaTouchIsSwipe = true;
+        mangaGoTo(mangaReader.page + (deltaX < 0 ? 1 : -1));
+    }
+}, { passive: true });
+
+mangaStage.addEventListener('touchend', (event) => {
+    if (!mangaTouchIsSwipe) return;
+
+    // 滑動後抑制同一手勢衍生的 click，避免重複翻頁
+    event.preventDefault();
+
+    setTimeout(() => { mangaTouchIsSwipe = false; }, 200);
+}, { passive: false });
+
+/* 進度提示 chip */
+let mangaResumeChip = null;
+
+function showMangaResumeChip(page) {
+    hideMangaResumeChip();
+
+    mangaResumeChip = document.createElement('div');
+    mangaResumeChip.className = 'manga-resume-chip';
+    mangaResumeChip.textContent = `${i18nData[mangaCurrentLang]['manga-resumed']} · ${page}`;
+    mangaStage.appendChild(mangaResumeChip);
+
+    setTimeout(() => {
+        if (mangaResumeChip) {
+            mangaResumeChip.classList.add('is-hidden');
+        }
+    }, 1600);
+
+    setTimeout(hideMangaResumeChip, 2200);
+}
+
+function hideMangaResumeChip() {
+    if (mangaResumeChip) {
+        mangaResumeChip.remove();
+        mangaResumeChip = null;
+    }
+}
+
+/* ==========================================================
+ *  翻譯
+ * ========================================================== */
+const i18nData = {
+    'zh-TW': {
+        'title': '滅Q - 漫畫',
+        'license-note': '網站原始碼採 MIT 授權（可自由使用、修改與商業利用，歡迎參考排版結構，但請改以自己的內容與圖檔）；美術、插畫、漫画等作品與本站視覺設計 © 滅Q（MiyQ），依 CC BY-NC-ND 4.0 授權（須署名、禁止商業使用與改作），並禁止作為 AI 模型訓練資料。',
+        'license-link': '授權條款',
+        'nav-home': '首頁',
+        'nav-gallery': '繪畫',
+        'nav-manga': '漫畫',
+        'nav-about': '關於',
+        'nav-ui': '下載',
+        'cursor-settings': '游標設定',
+        'manga-short': '短篇',
+        'manga-long': '長篇',
+        'manga-pages-unit': '頁',
+        'manga-chapters': '章節',
+        'manga-chapters-unit': '章',
+        'manga-preparing': '準備中',
+        'manga-empty': '敬請期待',
+        'manga-back': '返回',
+        'manga-hint': '點擊左右兩側或使用 ← → 翻頁',
+        'manga-resumed': '已回到上次閱讀位置'
+    },
+    'en': {
+        'title': '滅Q - Manga',
+        'license-note': 'Source code is MIT-licensed (free to use, modify and use commercially; reusing the layout is welcome, but please substitute your own content and images). Artwork, illustrations, manga and the visual design of this site © 滅Q (MiyQ), licensed CC BY-NC-ND 4.0 (attribution, no commercial use, no derivatives); not to be used as AI training data.',
+        'license-link': 'License',
+        'nav-home': 'Home',
+        'nav-gallery': 'Gallery',
+        'nav-manga': 'Manga',
+        'nav-about': 'About',
+        'nav-ui': 'Downloads',
+        'cursor-settings': 'Cursor Settings',
+        'manga-short': 'One-shots',
+        'manga-long': 'Series',
+        'manga-pages-unit': 'pages',
+        'manga-chapters': 'Chapters',
+        'manga-chapters-unit': 'chapters',
+        'manga-preparing': 'Coming soon',
+        'manga-empty': 'Please stay tuned',
+        'manga-back': 'Back',
+        'manga-hint': 'Tap left / right side, or use ← → to turn pages',
+        'manga-resumed': 'Resumed from your last page'
+    },
+    'ja': {
+        'title': '滅Q - 漫画',
+        'license-note': 'ソースコードは MIT ライセンスです（改変・商用利用可。レイアウトの参考は歓迎ですが、内容と画像はご自身のものに置き換えてください）。イラスト・挿絵・漫画等の作品および本サイトのビジュアルデザインは © 滅Q (MiyQ) で、CC BY-NC-ND 4.0（クレジット表記必須・商用不可・改作不可）に従い、AI モデルの学習用データとしての使用を禁止します。',
+        'license-link': 'ライセンス',
+        'nav-home': 'ホーム',
+        'nav-gallery': 'ギャラリー',
+        'nav-manga': '漫画',
+        'nav-about': 'プロフィール',
+        'nav-ui': 'ダウンロード',
+        'cursor-settings': 'カーソル設定',
+        'manga-short': '読み切り',
+        'manga-long': '連載',
+        'manga-pages-unit': 'ページ',
+        'manga-chapters': '話',
+        'manga-chapters-unit': '話',
+        'manga-preparing': '準備中',
+        'manga-empty': 'お楽しみに',
+        'manga-back': '戻る',
+        'manga-hint': '左右のタップまたは ← → でページめくり',
+        'manga-resumed': '前回の場所から再開'
+    }
+};
+
+function updatePageLanguage(lang) {
+    document.querySelectorAll('[data-i18n]').forEach((element) => {
+        const key = element.getAttribute('data-i18n');
+
+        if (i18nData[lang] && i18nData[lang][key]) {
+            element.textContent = i18nData[lang][key];
+        }
+    });
+
+    document.documentElement.lang =
+        lang === 'ja'
+            ? 'ja'
+            : lang === 'en'
+                ? 'en'
+                : 'zh-TW';
+
+    // 漫畫列表與閱讀器文字是動態建立的，切換語言後重新渲染
+    renderMangaList(lang);
+
+    document.documentElement.classList.remove('language-loading');
+}
+
+renderMangaList('zh-TW');
+</script>
+
+</html>

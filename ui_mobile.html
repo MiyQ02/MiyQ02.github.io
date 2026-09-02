@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <link rel="icon" href="./img/other/favicon.ico" type="image/x-icon">
+    <title data-i18n="title">滅Q - 下載</title>
+
+    <style>
+        html.language-loading body {
+            visibility: hidden;
+        }
+    </style>
+
+    <script>
+    (function () {
+        const lang = localStorage.getItem('lang');
+
+        if (lang === 'en' || lang === 'ja') {
+            document.documentElement.classList.add('language-loading');
+        }
+    })();
+    </script>
+
+    <script>
+        (function() {
+            let themeClass = localStorage.getItem('theme');
+            if (!themeClass) {
+                themeClass = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-theme' : 'light-theme';
+            } else {
+                themeClass = themeClass === 'dark' ? 'dark-theme' : 'light-theme';
+            }
+            document.documentElement.classList.add(themeClass);
+        })();
+    </script>
+
+<script>
+(function () {
+    const isMobilePage = location.pathname.split('/').pop().endsWith('_mobile.html');
+    const currentName = location.pathname.split('/').pop();
+
+    const desktopToMobile = {
+        'index.html': 'index_mobile.html',
+        'gallery.html': 'gallery_mobile.html',
+        'manga.html': 'manga_mobile.html',
+        'about.html': 'about_mobile.html',
+        'ui.html': 'ui_mobile.html'
+    };
+    const mobileToDesktop = {
+        'index_mobile.html': 'index.html',
+        'gallery_mobile.html': 'gallery.html',
+        'manga_mobile.html': 'manga.html',
+        'about_mobile.html': 'about.html',
+        'ui_mobile.html': 'ui.html'
+    };
+
+    function syncPageByViewport() {
+        const isMobileViewport = window.matchMedia('(max-width: 760px)').matches;
+        const target = isMobileViewport
+            ? desktopToMobile[currentName]
+            : mobileToDesktop[currentName];
+
+        if (target && (isMobileViewport !== isMobilePage)) {
+            location.replace(target);
+        }
+    }
+
+    syncPageByViewport();
+
+    const mediaQuery = window.matchMedia('(max-width: 760px)');
+    if (mediaQuery.addEventListener) {
+        mediaQuery.addEventListener('change', syncPageByViewport);
+    } else {
+        mediaQuery.addListener(syncPageByViewport);
+    }
+})();
+</script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style-mobile.css">
+    <script src="ui-items.js" defer></script>
+</head>
+
+<body class="mobile-site-page mobile-ui-page">
+    <header class="navbar mobile-navbar">
+        <nav>
+            <button id="mobile-menu-toggle" class="mobile-menu-toggle" type="button"
+                    aria-label="開啟選單" aria-expanded="false">
+                <span class="hamburger-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+                <span data-i18n="mobile-menu">選單</span>
+            </button>
+
+            <div class="nav-controls" aria-label="語言與主題設定">
+                <div class="lang-select-wrap">
+                    <select id="lang-select" aria-label="語言切換">
+                        <option value="zh-TW">中文（台灣）</option>
+                        <option value="en">English</option>
+                        <option value="ja">日本語</option>
+                    </select>
+                </div>
+                <button id="theme-toggle" type="button" aria-label="切換黑夜模式">🌙</button>
+            </div>
+        </nav>
+    </header>
+
+    <div id="mobile-menu-overlay" class="mobile-drawer-overlay" hidden></div>
+
+    <aside id="mobile-menu-drawer" class="mobile-drawer" aria-hidden="true">
+        <div class="mobile-drawer-header">
+            <h2 data-i18n="mobile-menu">選單</h2>
+            <button class="mobile-drawer-close" id="mobile-menu-close" type="button"
+                    aria-label="關閉選單">&times;</button>
+        </div>
+        <nav class="mobile-drawer-links" aria-label="手機版導覽">
+            <a href="index_mobile.html" class="mobile-drawer-link" data-i18n="nav-home">首頁</a>
+            <a href="gallery_mobile.html" class="mobile-drawer-link" data-i18n="nav-gallery">繪畫</a>
+            <a href="manga_mobile.html" class="mobile-drawer-link" data-i18n="nav-manga">漫畫</a>
+            <a href="ui_mobile.html" class="mobile-drawer-link active" data-i18n="nav-ui">下載</a>
+            <a href="about_mobile.html" class="mobile-drawer-link" data-i18n="nav-about">關於</a>
+        </nav>
+    </aside>
+
+    <main class="content-container ui-container">
+        <div class="ui-toolbar">
+            <input id="ui-search-input" class="miyq-search-input ui-search-input" type="search"
+                   autocomplete="off" spellcheck="false" aria-label="搜尋 UI 資源">
+
+            <div class="ui-explore" id="ui-explore">
+                <button class="ui-explore-btn" type="button" aria-haspopup="true" aria-expanded="false">
+                    <span class="ui-explore-btn-label">探索</span>
+                    <svg class="ui-explore-caret" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="m6 9 6 6 6-6"/>
+                    </svg>
+                </button>
+                <div class="ui-explore-menu" id="ui-explore-menu" role="menu"></div>
+            </div>
+        </div>
+
+        <div class="ui-grid" id="ui-list"></div>
+        <div class="ui-notice" id="ui-notice" hidden></div>
+    </main>
+
+    <!-- 站內授權聲明；語言切換由 ui-items.js 接管 -->
+    <footer class="site-license-footer">
+        <span data-i18n="license-note">網站原始碼採 MIT 授權（可自由使用、修改與商業利用，歡迎參考排版結構，但請改以自己的內容與圖檔）；美術、插畫、游標等作品與本站視覺設計 © 滅Q（MiyQ），依 CC BY-NC-ND 4.0 授權（須署名、禁止商業使用與改作），並禁止作為 AI 模型訓練資料。</span>
+        <a href="LICENSE.md" data-i18n="license-link">授權條款</a>
+    </footer>
+
+<script>
+/* 頁面框架文字（導覽列、標題、頁腳）；內容區翻譯由 ui-items.js 負責 */
+window.UI_PAGE_I18N = {
+    'zh-TW': {
+        'title': '滅Q - 下載',
+        'license-note': '網站原始碼採 MIT 授權（可自由使用、修改與商業利用，歡迎參考排版結構，但請改以自己的內容與圖檔）；美術、插畫、游標等作品與本站視覺設計 © 滅Q（MiyQ），依 CC BY-NC-ND 4.0 授權（須署名、禁止商業使用與改作），並禁止作為 AI 模型訓練資料。',
+        'license-link': '授權條款',
+        'mobile-menu': '選單',
+        'nav-home': '首頁',
+        'nav-gallery': '繪畫',
+        'nav-manga': '漫畫',
+        'nav-ui': '下載',
+        'nav-about': '關於',
+        'cursor-settings': '游標設定'
+    },
+    'en': {
+        'title': '滅Q - Downloads',
+        'license-note': 'Source code is MIT-licensed (free to use, modify and use commercially; reusing the layout is welcome, but please substitute your own content and images). Artwork, illustrations, cursors and the visual design of this site © 滅Q (MiyQ), licensed CC BY-NC-ND 4.0 (attribution, no commercial use, no derivatives); not to be used as AI training data.',
+        'license-link': 'License',
+        'mobile-menu': 'Menu',
+        'nav-home': 'Home',
+        'nav-gallery': 'Gallery',
+        'nav-manga': 'Manga',
+        'nav-ui': 'Downloads',
+        'nav-about': 'About',
+        'cursor-settings': 'Cursor Settings'
+    },
+    'ja': {
+        'title': '滅Q - ダウンロード',
+        'license-note': 'ソースコードは MIT ライセンスです（改変・商用利用可。レイアウトの参考は歓迎ですが、内容と画像はご自身のものに置き換えてください）。イラスト・挿絵・カーソル等の作品および本サイトのビジュアルデザインは © 滅Q (MiyQ) で、CC BY-NC-ND 4.0（クレジット表記必須・商用不可・改作不可）に従い、AI モデルの学習用データとしての使用を禁止します。',
+        'license-link': 'ライセンス',
+        'mobile-menu': 'メニュー',
+        'nav-home': 'ホーム',
+        'nav-gallery': 'ギャラリー',
+        'nav-manga': '漫画',
+        'nav-ui': 'ダウンロード',
+        'nav-about': 'プロフィール',
+        'cursor-settings': 'カーソル設定'
+    }
+};
+</script>
+
+<script>
+const themeToggle = document.getElementById('theme-toggle');
+const langSelect = document.getElementById('lang-select');
+const themeButtons = [themeToggle].filter(Boolean);
+const languageSelects = [langSelect].filter(Boolean);
+
+const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+const mobileMenuDrawer = document.getElementById('mobile-menu-drawer');
+const mobileMenuClose = document.getElementById('mobile-menu-close');
+const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+
+function closeMobileMenu() {
+    if (!mobileMenuDrawer) return;
+    mobileMenuDrawer.classList.remove('is-open');
+    mobileMenuDrawer.setAttribute('aria-hidden', 'true');
+    mobileMenuToggle?.setAttribute('aria-expanded', 'false');
+    if (mobileMenuOverlay) mobileMenuOverlay.hidden = true;
+    document.body.classList.remove('drawer-open');
+}
+
+function openMobileMenu() {
+    mobileMenuDrawer?.classList.add('is-open');
+    mobileMenuDrawer?.setAttribute('aria-hidden', 'false');
+    mobileMenuToggle?.setAttribute('aria-expanded', 'true');
+    if (mobileMenuOverlay) mobileMenuOverlay.hidden = false;
+    document.body.classList.add('drawer-open');
+}
+
+mobileMenuToggle?.addEventListener('click', openMobileMenu);
+mobileMenuClose?.addEventListener('click', closeMobileMenu);
+mobileMenuOverlay?.addEventListener('click', closeMobileMenu);
+
+function applyStoredTheme(themeName) {
+    const isDark = themeName === 'dark';
+    document.documentElement.classList.remove('light-theme', 'dark-theme');
+    document.documentElement.classList.add(isDark ? 'dark-theme' : 'light-theme');
+    document.body.classList.toggle('dark-theme', isDark);
+
+    themeButtons.forEach((button) => {
+        button.textContent = isDark ? '☀️' : '🌙';
+        button.setAttribute('aria-label', isDark ? '切換為白天模式' : '切換為黑夜模式');
+    });
+}
+
+function applyStoredLanguage(languageCode) {
+    const normalized = ['en', 'ja'].includes(languageCode) ? languageCode : 'zh-TW';
+    document.documentElement.style.setProperty(
+        '--lang-flag-url',
+        `url("${normalized === 'en' ? './img/other/USA.svg' : normalized === 'ja' ? './img/other/JP.svg' : './img/other/TW.svg'}")`
+    );
+    languageSelects.forEach((select) => select.value = normalized);
+    if (typeof updatePageLanguage === 'function') updatePageLanguage(normalized);
+}
+
+function syncGlobalControls() {
+    try {
+        let savedTheme = localStorage.getItem('theme');
+        if (!savedTheme) savedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        applyStoredTheme(savedTheme);
+        applyStoredLanguage(localStorage.getItem('lang') || 'zh-TW');
+    } catch (error) {
+        applyStoredTheme('light');
+        applyStoredLanguage('zh-TW');
+    }
+}
+
+themeButtons.forEach((button) => button.addEventListener('click', () => {
+    const nextTheme = document.documentElement.classList.contains('dark-theme') ? 'light' : 'dark';
+    try { localStorage.setItem('theme', nextTheme); } catch (error) {}
+    applyStoredTheme(nextTheme);
+}));
+
+languageSelects.forEach((select) => select.addEventListener('change', (event) => {
+    const nextLanguage = ['en', 'ja'].includes(event.target.value) ? event.target.value : 'zh-TW';
+    try { localStorage.setItem('lang', nextLanguage); } catch (error) {}
+    applyStoredLanguage(nextLanguage);
+}));
+
+document.addEventListener('DOMContentLoaded', syncGlobalControls);
+</script>
+</body>
+</html>

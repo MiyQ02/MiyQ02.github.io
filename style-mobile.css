@@ -431,3 +431,133 @@ body.mobile-site-page .mobile-about-container .contact-list {
         flex-basis: 72px;
     }
 }
+
+/* ==========================================================
+   漫畫手機版頁面（manga_mobile.html）
+   ========================================================== */
+body.mobile-site-page .mobile-manga-container {
+    width: min(100%, 760px);
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 16px 14px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+body.mobile-site-page .mobile-manga-container .manga-work-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+body.mobile-site-page .mobile-manga-container .manga-section-title {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+body.mobile-site-page .mobile-manga-container .manga-work-title {
+    font-size: 14px;
+}
+
+/* 閱讀器在小螢幕的緊湊化 */
+.manga-overlay .manga-hud {
+    padding: 8px 10px;
+    gap: 8px;
+}
+
+.manga-overlay .manga-hud-title {
+    font-size: 14px;
+}
+
+.manga-overlay .manga-hud-btn {
+    padding: 5px 11px;
+    font-size: 13px;
+}
+
+.manga-overlay .manga-page-indicator {
+    font-size: 12px;
+}
+
+/* 觸控裝置不需要滑鼠悬停的箭頭提示 */
+@media (hover: none) {
+    .manga-zone:hover::after {
+        opacity: 0;
+    }
+}
+
+@media (max-width: 420px) {
+    body.mobile-site-page .mobile-manga-container .manga-work-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+body.mobile-site-page .manga-chapter-item {
+    min-height: 44px;
+    font-size: 15px;
+}
+
+body.mobile-site-page .manga-chapter-panel {
+    margin-top: 2px;
+}
+
+/* ==========================================================
+   站內授權聲明頁腳：手機版未載入 cursor-settings.css，
+   此處依電腦版（cursor-settings.css .site-license-footer）
+   同等樣式補齊，並加大左右留白。
+   ========================================================== */
+.site-license-footer {
+    margin-top: 28px;
+    padding: 16px 22px 24px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--text-muted, #777);
+    border-top: 1px solid var(--border);
+}
+
+.site-license-footer a {
+    color: var(--accent);
+    text-decoration: none;
+    margin-left: 6px;
+    white-space: nowrap;
+}
+
+.site-license-footer a:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================================
+   UI 資源頁手機版：單欄卡片、防 iOS 自動縮放
+   ========================================================== */
+body.mobile-ui-page .ui-toolbar {
+    margin-bottom: 16px;
+}
+
+body.mobile-ui-page .miyq-search-input,
+body.mobile-ui-page .ui-explore-btn {
+    font-size: 15px;
+}
+
+body.mobile-ui-page .ui-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+body.mobile-ui-page .ui-card-head {
+    flex-direction: column;
+    gap: 2px;
+}
+
+body.mobile-ui-page .ui-explore-menu {
+    min-width: min(300px, calc(100vw - 40px));
+}
+
+body.mobile-ui-page .ui-lightbox {
+    padding: 12px;
+}
+
+body.mobile-ui-page .ui-lightbox-close {
+    top: 6px;
+    right: 12px;
+    font-size: 38px;
+}

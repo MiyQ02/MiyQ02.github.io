@@ -51,12 +51,16 @@
     const desktopToMobile = {
         'index.html': 'index_mobile.html',
         'gallery.html': 'gallery_mobile.html',
-        'about.html': 'about_mobile.html'
+        'manga.html': 'manga_mobile.html',
+        'about.html': 'about_mobile.html',
+        'ui.html': 'ui_mobile.html'
     };
     const mobileToDesktop = {
         'index_mobile.html': 'index.html',
         'gallery_mobile.html': 'gallery.html',
-        'about_mobile.html': 'about.html'
+        'manga_mobile.html': 'manga.html',
+        'about_mobile.html': 'about.html',
+        'ui_mobile.html': 'ui.html'
     };
 
     function syncPageByViewport() {
@@ -82,6 +86,7 @@
 </script>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="style-mobile.css">
+    <script src="labels.js" defer></script>
 </head>
 <body class="mobile-gallery-page mobile-site-page">
 
@@ -115,6 +120,8 @@
         <nav class="mobile-drawer-links" aria-label="手機版導覽">
             <a href="index_mobile.html" class="mobile-drawer-link" data-i18n="nav-home">首頁</a>
             <a href="gallery_mobile.html" class="mobile-drawer-link active" data-i18n="nav-gallery">繪畫</a>
+            <a href="manga_mobile.html" class="mobile-drawer-link" data-i18n="nav-manga">漫畫</a>
+            <a href="ui_mobile.html" class="mobile-drawer-link" data-i18n="nav-ui">下載</a>
             <a href="about_mobile.html" class="mobile-drawer-link" data-i18n="nav-about">關於</a>
         </nav>
     </aside>
@@ -2747,7 +2754,10 @@ const i18nData = {
         'license-link': '授權條款',
         'nav-home': '首頁',
         'nav-gallery': '繪畫',
+        'nav-manga': '漫畫',
         'nav-about': '關於',
+        'nav-ui': '下載',
+        'cursor-settings': '游標設定',
         'mobile-menu': '選單',
         'gallery-years': '年份',
         'gallery-empty': '請至少勾選一個年份。',
@@ -2760,7 +2770,10 @@ const i18nData = {
         'license-link': 'License',
         'nav-home': 'Home',
         'nav-gallery': 'Gallery',
+        'nav-manga': 'Manga',
         'nav-about': 'About',
+        'nav-ui': 'Downloads',
+        'cursor-settings': 'Cursor Settings',
         'mobile-menu': 'Menu',
         'gallery-years': 'Years',
         'gallery-empty': 'Please select at least one year.',
@@ -2773,7 +2786,10 @@ const i18nData = {
         'license-link': 'ライセンス',
         'nav-home': 'ホーム',
         'nav-gallery': 'ギャラリー',
+        'nav-manga': '漫画',
         'nav-about': 'プロフィール',
+        'nav-ui': 'ダウンロード',
+        'cursor-settings': 'カーソル設定',
         'mobile-menu': 'メニュー',
         'gallery-years': '年',
         'gallery-empty': '少なくとも1つの年を選択してください。',

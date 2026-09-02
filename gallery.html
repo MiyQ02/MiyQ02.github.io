@@ -51,13 +51,17 @@
     const desktopToMobile = {
         'index.html': 'index_mobile.html',
         'gallery.html': 'gallery_mobile.html',
-        'about.html': 'about_mobile.html'
+        'manga.html': 'manga_mobile.html',
+        'about.html': 'about_mobile.html',
+        'ui.html': 'ui_mobile.html'
     };
 
     const mobileToDesktop = {
         'index_mobile.html': 'index.html',
         'gallery_mobile.html': 'gallery.html',
-        'about_mobile.html': 'about.html'
+        'manga_mobile.html': 'manga.html',
+        'about_mobile.html': 'about.html',
+        'ui_mobile.html': 'ui.html'
     };
 
     function syncPageByViewport() {
@@ -87,6 +91,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="cursor-settings.css">
     <script src="cursor-settings.js" defer></script>
+    <script src="labels.js" defer></script>
     <script>
     // 首幀前套用游標集與已快取的縮放尺寸：自訂游標（含大小）從第一幀就生效
     (function () {
@@ -132,11 +137,14 @@
                     aria-haspopup="dialog" aria-expanded="false" aria-controls="cursor-settings-modal"
                     title="游標設定">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span class="cursor-settings-label" data-i18n="cursor-settings">游標設定</span>
             </button>
             <div class="nav-links">
                 <a href="index.html" class="nav-item" data-i18n="nav-home">首頁</a>
                 <!-- 作品集目前是 active 狀態 -->
                 <a href="gallery.html" class="nav-item active" data-i18n="nav-gallery">繪畫</a>
+                <a href="manga.html" class="nav-item" data-i18n="nav-manga">漫畫</a>
+                <a href="ui.html" class="nav-item" data-i18n="nav-ui">下載</a>
                 <a href="about.html" class="nav-item" data-i18n="nav-about">關於</a>
             </div>
 
@@ -2654,7 +2662,10 @@ const i18nData = {
         'license-link': '授權條款',
         'nav-home': '首頁',
         'nav-gallery': '繪畫',
+        'nav-manga': '漫畫',
         'nav-about': '關於',
+        'nav-ui': '下載',
+        'cursor-settings': '游標設定',
         'gallery-years': '年份',
         'gallery-empty': '請至少勾選一個年份。',
         'image-missing': '縮圖不存在',
@@ -2666,7 +2677,10 @@ const i18nData = {
         'license-link': 'License',
         'nav-home': 'Home',
         'nav-gallery': 'Gallery',
+        'nav-manga': 'Manga',
         'nav-about': 'About',
+        'nav-ui': 'Downloads',
+        'cursor-settings': 'Cursor Settings',
         'gallery-years': 'Years',
         'gallery-empty': 'Please select at least one year.',
         'image-missing': 'Thumbnail not found',
@@ -2678,7 +2692,10 @@ const i18nData = {
         'license-link': 'ライセンス',
         'nav-home': 'ホーム',
         'nav-gallery': 'ギャラリー',
+        'nav-manga': '漫画',
         'nav-about': 'プロフィール',
+        'nav-ui': 'ダウンロード',
+        'cursor-settings': 'カーソル設定',
         'gallery-years': '年',
         'gallery-empty': '少なくとも1つの年を選択してください。',
         'image-missing': 'サムネイルが見つかりません',
