@@ -43,7 +43,7 @@
 
 <script>
 (function () {
-    const currentName = location.pathname.split('/').pop() || 'ui.html';
+    const currentName = location.pathname.split('/').pop() || 'download.html';
     const isMobilePage = currentName.endsWith('_mobile.html');
 
     const desktopToMobile = {
@@ -51,7 +51,7 @@
         'gallery.html': 'gallery_mobile.html',
         'manga.html': 'manga_mobile.html',
         'about.html': 'about_mobile.html',
-        'ui.html': 'ui_mobile.html'
+        'download.html': 'download_mobile.html'
     };
 
     const mobileToDesktop = {
@@ -59,7 +59,7 @@
         'gallery_mobile.html': 'gallery.html',
         'manga_mobile.html': 'manga.html',
         'about_mobile.html': 'about.html',
-        'ui_mobile.html': 'ui.html'
+        'download_mobile.html': 'download.html'
     };
 
     function syncPageByViewport() {
@@ -89,7 +89,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="cursor-settings.css">
     <script src="cursor-settings.js" defer></script>
-    <script src="ui-items.js" defer></script>
+    <script src="download-items.js" defer></script>
     <script>
     // 首幀前套用游標集與已快取的縮放尺寸：自訂游標（含大小）從第一幀就生效
     (function () {
@@ -140,7 +140,7 @@
                 <a href="index.html" class="nav-item" data-i18n="nav-home">首頁</a>
                 <a href="gallery.html" class="nav-item" data-i18n="nav-gallery">繪畫</a>
                 <a href="manga.html" class="nav-item" data-i18n="nav-manga">漫畫</a>
-                <a href="ui.html" class="nav-item active" data-i18n="nav-ui">下載</a>
+                <a href="download.html" class="nav-item active" data-i18n="nav-download">下載</a>
                 <a href="about.html" class="nav-item" data-i18n="nav-about">關於</a>
             </div>
 
@@ -170,28 +170,28 @@
         </div>
     </div>
 
-    <main class="content-container ui-container">
-        <div class="ui-toolbar">
-            <input id="ui-search-input" class="miyq-search-input ui-search-input" type="search"
+    <main class="content-container dl-container">
+        <div class="dl-toolbar">
+            <input id="dl-search-input" class="miyq-search-input dl-search-input" type="search"
                    autocomplete="off" spellcheck="false" aria-label="搜尋 UI 資源">
 
-            <div class="ui-explore" id="ui-explore">
-                <button class="ui-explore-btn" type="button" aria-haspopup="true" aria-expanded="false">
-                    <span class="ui-explore-btn-label">探索</span>
-                    <svg class="ui-explore-caret" width="12" height="12" viewBox="0 0 24 24" fill="none"
+            <div class="dl-explore" id="dl-explore">
+                <button class="dl-explore-btn" type="button" aria-haspopup="true" aria-expanded="false">
+                    <span class="dl-explore-btn-label">探索</span>
+                    <svg class="dl-explore-caret" width="12" height="12" viewBox="0 0 24 24" fill="none"
                          stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="m6 9 6 6 6-6"/>
                     </svg>
                 </button>
-                <div class="ui-explore-menu" id="ui-explore-menu" role="menu"></div>
+                <div class="dl-explore-menu" id="dl-explore-menu" role="menu"></div>
             </div>
         </div>
 
-        <div class="ui-grid" id="ui-list"></div>
-        <div class="ui-notice" id="ui-notice" hidden></div>
+        <div class="dl-grid" id="dl-list"></div>
+        <div class="dl-notice" id="dl-notice" hidden></div>
     </main>
 
-    <!-- 站內授權聲明；語言切換由 ui-items.js 接管 -->
+    <!-- 站內授權聲明；語言切換由 download-items.js 接管 -->
     <footer class="site-license-footer">
         <span data-i18n="license-note">網站原始碼採 MIT 授權（可自由使用、修改與商業利用，歡迎參考排版結構，但請改以自己的內容與圖檔）；美術、插畫、游標等作品與本站視覺設計 © 滅Q（MiyQ），依 CC BY-NC-ND 4.0 授權（須署名、禁止商業使用與改作），並禁止作為 AI 模型訓練資料。</span>
         <a href="LICENSE.md" data-i18n="license-link">授權條款</a>
@@ -200,8 +200,8 @@
 </body>
 
 <script>
-/* 頁面框架文字（導覽列、標題、頁腳）；內容區翻譯由 ui-items.js 負責 */
-window.UI_PAGE_I18N = {
+/* 頁面框架文字（導覽列、標題、頁腳）；內容區翻譯由 download-items.js 負責 */
+window.DL_PAGE_I18N = {
     'zh-TW': {
         'title': '滅Q - 下載',
         'license-note': '網站原始碼採 MIT 授權（可自由使用、修改與商業利用，歡迎參考排版結構，但請改以自己的內容與圖檔）；美術、插畫、游標等作品與本站視覺設計 © 滅Q（MiyQ），依 CC BY-NC-ND 4.0 授權（須署名、禁止商業使用與改作），並禁止作為 AI 模型訓練資料。',
@@ -209,7 +209,7 @@ window.UI_PAGE_I18N = {
         'nav-home': '首頁',
         'nav-gallery': '繪畫',
         'nav-manga': '漫畫',
-        'nav-ui': '下載',
+        'nav-download': '下載',
         'nav-about': '關於',
         'cursor-settings': '游標設定'
     },
@@ -220,7 +220,7 @@ window.UI_PAGE_I18N = {
         'nav-home': 'Home',
         'nav-gallery': 'Gallery',
         'nav-manga': 'Manga',
-        'nav-ui': 'Downloads',
+        'nav-download': 'Downloads',
         'nav-about': 'About',
         'cursor-settings': 'Cursor Settings'
     },
@@ -231,7 +231,7 @@ window.UI_PAGE_I18N = {
         'nav-home': 'ホーム',
         'nav-gallery': 'ギャラリー',
         'nav-manga': '漫画',
-        'nav-ui': 'ダウンロード',
+        'nav-download': 'ダウンロード',
         'nav-about': 'プロフィール',
         'cursor-settings': 'カーソル設定'
     }

@@ -9,8 +9,7 @@
  *           MANGA_LIBRARY 的 id／作品鍵一致）
  *   value = 標籤陣列，每個標籤寫成「中文|英文|日文」字串。
  *
- * 沒有設定標籤的作品會自動退回「原創|Original|オリジナル」，
- * 因此早期無標題作品不需要逐筆填寫。
+ * 沒有設定標籤的作品不顯示標籤列。
  * 搜尋會比對：三語作品標題＋全部標籤（三語）＋檔名。
  * ========================================================== */
 window.MIYQ_LABELS = {
@@ -20,13 +19,13 @@ window.MIYQ_LABELS = {
         '138':   ['NYN姉貴|NYN-neesan|NYN姉貴', '貼圖|Sticker|スタンプ'],
         '137':   ['少女終末旅行|Girls’ Last Tour|少女終末旅行', '尤莉|Yuuri|ユーリ'],
         '136':   ['吻|Kiss|キス'],
-        '135':   ['原創|Original|オリジナル'],
+        '135':   ['蘑菇的擬態日常|Shimeji Simulation|シメジ シミュレーション'],
         '134':   ['兼任 MagicalDraw|MagicalDraw|MagicalDraw'],
         '133':   ['蘑菇的擬態日常|Shimeji Simulation|シメジ シミュレーション', '山下真面目|Yamashita Majime|山下まじめ', '游標|Cursor|カーソル'],
-        '132':   ['蘑菇的擬態日常|Shimeji Simulation|シメジ シミュレーション', '月島靜寂|Tsukishima Shizuka|月島しじま', '游標|Cursor|カーソル'],
-        '131':   ['原創|Original|オリジナル'],
-        '130-2': ['原創|Original|オリジナル'],
-        '130':   ['原創|Original|オリジナル'],
+        '132':   ['蘑菇的擬態日常|Shimeji Simulation|シメジ シミュレーション', '月島靜寂|Tsukishima Shijima|月島しじま', '游標|Cursor|カーソル'],
+        '131':   ['蘑菇的擬態日常|Shimeji Simulation|シメジ シミュレーション'],
+        '130-2': ['蘑菇的擬態日常|Shimeji Simulation|シメジ シミュレーション'],
+        '130':   ['蘑菇的擬態日常|Shimeji Simulation|シメジ シミュレーション'],
         '129':   ['蘑菇的擬態日常|Shimeji Simulation|シメジ シミュレーション', '游標|Cursor|カーソル'],
         '128-2': ['少女終末旅行|Girls’ Last Tour|少女終末旅行', '桌布|Wallpaper|壁紙'],
         '128':   ['少女終末旅行|Girls’ Last Tour|少女終末旅行', '桌布|Wallpaper|壁紙'],
@@ -34,14 +33,12 @@ window.MIYQ_LABELS = {
         '127':   ['筆記本|Notebook|ノート', '塗鴉|Doodle|落書き'],
         '126':   ['少女終末旅行|Girls’ Last Tour|少女終末旅行', '尤莉|Yuuri|ユーリ'],
         '125':   ['筆記本|Notebook|ノート', '塗鴉|Doodle|落書き'],
-        '124':   ['原創|Original|オリジナル'],
+        '124':   ['少女終末旅行|Girls’ Last Tour|少女終末旅行'],
         '123':   ['BanG Dream!|BanG Dream!|バンドリ!', '豐川祥子|Sakiko Togawa|豊川祥子'],
         '122':   ['雪|Snow|雪'],
-        '121':   ['原創|Original|オリジナル'],
         '120':   ['少女終末旅行|Girls’ Last Tour|少女終末旅行', '千都|Chito|チト', '游標|Cursor|カーソル'],
         '119':   ['MGR姉貴|MGR-neesan|MGR姉貴'],
-        '118':   ['原創|Original|オリジナル'],
-        '117':   ['尹曉風|Yin Xiaofeng|尹曉風', '原創角色|Original Character|オリジナルキャラ'],
+        '117':   ['尹曉風|Yin Xiaofeng|尹曉風'],
         '116':   ['小紅帽|Red Riding Hood|赤ずきん'],
         '115':   ['少女終末旅行|Girls’ Last Tour|少女終末旅行', '尤莉|Yuuri|ユーリ', '游標|Cursor|カーソル'],
         '114':   ['兼任 MagicalDraw|MagicalDraw|MagicalDraw'],
@@ -60,7 +57,7 @@ window.MIYQ_LABELS = {
         '101':   ['BanG Dream!|BanG Dream!|バンドリ!', '若葉睦|Mutsumi Wakaba|若葉睦'],
         '100':   ['筆記本|Notebook|ノート', '塗鴉|Doodle|落書き'],
         // ===== 2024 =====
-        '99':    ['原創角色|Original Character|オリジナルキャラ', 'OC交換|OC Exchange|OC交換会'],
+        '99':    ['OC交換|OC Exchange|OC交換会'],
         '98':    ['筆記本|Notebook|ノート', '塗鴉|Doodle|落書き'],
         '97':    ['經濟學|Economics|経済学', '教科書|Textbook|教科書', '塗鴉|Doodle|落書き'],
         '96':    ['筆記本|Notebook|ノート', '塗鴉|Doodle|落書き'],
@@ -85,7 +82,6 @@ window.MIYQ_LABELS = {
         '78':    ['生日|Birthday|誕生日'],
         '77':    ['Drugsneko|Drugsneko|Drugsneko'],
         '76':    ['小畫家|MS Paint|ペイント'],
-        '75':    ['原創|Original|オリジナル'],
         '74':    ['筆記本|Notebook|ノート', '塗鴉|Doodle|落書き'],
         '73':    ['筆記本|Notebook|ノート', '塗鴉|Doodle|落書き'],
         '72':    ['練習|Practice|練習'],
@@ -96,10 +92,7 @@ window.MIYQ_LABELS = {
         '55':    ['筆記本|Notebook|ノート', '塗鴉|Doodle|落書き'],
         '43':    ['筆記本|Notebook|ノート', '塗鴉|Doodle|落書き']
     },
-    manga: {
-        '500': ['原創|Original|オリジナル'],
-        'K':   ['原創|Original|オリジナル']
-    }
+    manga: {}
 };
 
 /* ==========================================================
@@ -108,9 +101,8 @@ window.MIYQ_LABELS = {
 (function () {
     'use strict';
 
-    const FALLBACK_LABEL = { zh: '原創', en: 'Original', ja: 'オリジナル' };
 
-    const UI_TEXT = {
+    const DL_TEXT = {
         'zh-TW': { placeholder: '搜尋作品名稱或標籤…', aria: '搜尋作品', empty: '找不到符合的作品' },
         'en':    { placeholder: 'Search titles or tags…', aria: 'Search works', empty: 'No matching works' },
         'ja':    { placeholder: 'タイトル・タグを検索…', aria: '作品を検索', empty: '一致する作品がありません' }
@@ -142,7 +134,7 @@ window.MIYQ_LABELS = {
         const table = window.MIYQ_LABELS[bucket];
         const raw = table && table[key];
         if (!raw || !raw.length) {
-            return [FALLBACK_LABEL];
+            return [];
         }
         return raw.map(parseLabel);
     }
@@ -210,7 +202,7 @@ window.MIYQ_LABELS = {
     }
 
     function syncSearchBar(bar) {
-        const text = UI_TEXT[currentLang()] || UI_TEXT['zh-TW'];
+        const text = DL_TEXT[currentLang()] || DL_TEXT['zh-TW'];
         bar._input.placeholder = text.placeholder;
         bar._input.setAttribute('aria-label', text.aria);
     }
@@ -231,7 +223,7 @@ window.MIYQ_LABELS = {
             line = makeEmptyLine();
             container.appendChild(line);
         }
-        line.textContent = (UI_TEXT[currentLang()] || UI_TEXT['zh-TW']).empty;
+        line.textContent = (DL_TEXT[currentLang()] || DL_TEXT['zh-TW']).empty;
     }
 
     /* ---------------- 繪畫頁 ---------------- */
@@ -403,18 +395,29 @@ window.MIYQ_LABELS = {
                 return;
             }
 
+            const lang = currentLang();
+            const langKey = lang === 'zh-TW' ? 'zh' : lang;
+            const labels = labelsFor('gallery', filename);
+            if (!labels.length) {
+                return;
+            }
+
             const box = document.createElement('div');
             box.className = 'work-tags';
 
-            labelsFor('gallery', filename).forEach((label) => {
+            labels.forEach((label) => {
+                const text = label[langKey] || label.zh || label.en || label.ja;
+                if (!text) {
+                    return;
+                }
                 const chip = document.createElement('span');
-                chip.textContent = [label.zh, label.en, label.ja]
-                    .filter(Boolean)
-                    .join(' / ');
+                chip.textContent = text;
                 box.appendChild(chip);
             });
 
-            description.insertAdjacentElement('afterend', box);
+            if (box.children.length) {
+                description.insertAdjacentElement('afterend', box);
+            }
         }
 
         const origOpen = window.openGalleryLightbox;

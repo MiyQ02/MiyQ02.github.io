@@ -529,34 +529,34 @@ body.mobile-site-page .manga-chapter-panel {
 /* ==========================================================
    UI 資源頁手機版：單欄卡片、防 iOS 自動縮放
    ========================================================== */
-body.mobile-ui-page .ui-toolbar {
+body.mobile-dl-page .dl-toolbar {
     margin-bottom: 16px;
 }
 
-body.mobile-ui-page .miyq-search-input,
-body.mobile-ui-page .ui-explore-btn {
+body.mobile-dl-page .miyq-search-input,
+body.mobile-dl-page .dl-explore-btn {
     font-size: 15px;
 }
 
-body.mobile-ui-page .ui-grid {
+body.mobile-dl-page .dl-grid {
     grid-template-columns: 1fr;
     gap: 16px;
 }
 
-body.mobile-ui-page .ui-card-head {
+body.mobile-dl-page .dl-card-head {
     flex-direction: column;
     gap: 2px;
 }
 
-body.mobile-ui-page .ui-explore-menu {
+body.mobile-dl-page .dl-explore-menu {
     min-width: min(300px, calc(100vw - 40px));
 }
 
-body.mobile-ui-page .ui-lightbox {
+body.mobile-dl-page .dl-lightbox {
     padding: 12px;
 }
 
-body.mobile-ui-page .ui-lightbox-close {
+body.mobile-dl-page .dl-lightbox-close {
     top: 6px;
     right: 12px;
     font-size: 38px;

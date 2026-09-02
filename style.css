@@ -1338,10 +1338,11 @@ body.manga-reading {
     letter-spacing: 1px;
 }
 
-/* 彈窗內三語標籤：顯示在簡介下方、靠左 */
+/* 作品標籤列：顯示在簡介下方、置中，僅當前語言 */
 .work-tags {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 6px;
     margin: 10px 0 6px;
 }
@@ -1356,27 +1357,27 @@ body.manga-reading {
 }
 
 /* ==========================================================
-   UI 資源頁（ui.html / ui_mobile.html，由 ui-items.js 渲染）
+   UI 資源頁（download.html / download_mobile.html，由 download-items.js 渲染）
    ========================================================== */
-.ui-toolbar {
+.dl-toolbar {
     display: flex;
     align-items: stretch;
     gap: 10px;
     margin: 0 0 22px;
 }
 
-.ui-search-input {
+.dl-search-input {
     flex: 1 1 auto;
     min-width: 0;
 }
 
 /* --- 探索下拉列表：hover 展開、點擊切換（手機版） --- */
-.ui-explore {
+.dl-explore {
     position: relative;
     flex: 0 0 auto;
 }
 
-.ui-explore-btn {
+.dl-explore-btn {
     display: inline-flex;
     align-items: center;
     gap: 7px;
@@ -1391,21 +1392,21 @@ body.manga-reading {
     cursor: pointer;
 }
 
-.ui-explore-btn:hover,
-.ui-explore.is-open .ui-explore-btn {
+.dl-explore-btn:hover,
+.dl-explore.is-open .dl-explore-btn {
     border-color: var(--accent);
 }
 
-.ui-explore-caret {
+.dl-explore-caret {
     transition: transform 0.15s ease;
 }
 
-.ui-explore:hover .ui-explore-caret,
-.ui-explore.is-open .ui-explore-caret {
+.dl-explore:hover .dl-explore-caret,
+.dl-explore.is-open .dl-explore-caret {
     transform: rotate(180deg);
 }
 
-.ui-explore-menu {
+.dl-explore-menu {
     display: none;
     position: absolute;
     top: calc(100% + 6px);
@@ -1419,13 +1420,13 @@ body.manga-reading {
     box-shadow: 0 10px 24px var(--shadow);
 }
 
-.ui-explore:hover .ui-explore-menu,
-.ui-explore.is-open .ui-explore-menu,
-.ui-explore:focus-within .ui-explore-menu {
+.dl-explore:hover .dl-explore-menu,
+.dl-explore.is-open .dl-explore-menu,
+.dl-explore:focus-within .dl-explore-menu {
     display: block;
 }
 
-.ui-explore-item {
+.dl-explore-item {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -1441,25 +1442,25 @@ body.manga-reading {
     cursor: pointer;
 }
 
-.ui-explore-item:hover {
+.dl-explore-item:hover {
     background: var(--glass-bg);
 }
 
-.ui-explore-item.is-active {
+.dl-explore-item.is-active {
     color: var(--accent);
 }
 
-.ui-explore-name {
+.dl-explore-name {
     flex: 1 1 auto;
     font-weight: 600;
 }
 
-.ui-explore-count {
+.dl-explore-count {
     color: var(--text-muted);
     font-size: 12px;
 }
 
-.ui-explore-date {
+.dl-explore-date {
     color: var(--text-muted);
     font-size: 12px;
     font-variant-numeric: tabular-nums;
@@ -1467,13 +1468,13 @@ body.manga-reading {
 }
 
 /* --- 資源卡片網格 --- */
-.ui-grid {
+.dl-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px;
 }
 
-.ui-card {
+.dl-card {
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -1483,58 +1484,58 @@ body.manga-reading {
     box-shadow: 0 8px 18px var(--shadow);
 }
 
-.ui-card-media {
+.dl-card-media {
     border-bottom: 1px solid var(--border);
     background: var(--card-bg, transparent);
 }
 
-.ui-card-media img {
+.dl-card-media img {
     display: block;
     width: 100%;
     aspect-ratio: 16 / 9;
     object-fit: cover;
 }
 
-.ui-card-body {
+.dl-card-body {
     display: flex;
     flex-direction: column;
     gap: 8px;
     padding: 14px 16px 16px;
 }
 
-.ui-card-head {
+.dl-card-head {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
     gap: 10px;
 }
 
-.ui-card-head h3 {
+.dl-card-head h3 {
     margin: 0;
     font-size: 16px;
 }
 
-.ui-card-head time {
+.dl-card-head time {
     color: var(--text-muted);
     font-size: 12px;
     white-space: nowrap;
 }
 
-.ui-card-desc {
+.dl-card-desc {
     margin: 0;
     color: var(--text-soft);
     font-size: 13px;
     line-height: 1.7;
 }
 
-.ui-card-actions {
+.dl-card-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     margin-top: 4px;
 }
 
-.ui-dl-btn {
+.dl-btn {
     display: inline-flex;
     align-items: center;
     padding: 7px 14px;
@@ -1545,16 +1546,16 @@ body.manga-reading {
     text-decoration: none;
 }
 
-.ui-dl-btn:hover {
+.dl-btn:hover {
     background: var(--glass-bg);
 }
 
-.ui-dl-btn.is-placeholder {
+.dl-btn.is-placeholder {
     border-style: dashed;
     color: var(--text-muted);
 }
 
-.ui-notice {
+.dl-notice {
     padding: 30px 20px;
     border: 1px dashed var(--border);
     border-radius: 8px;
@@ -1577,8 +1578,8 @@ body.manga-reading {
     white-space: nowrap;
 }
 
-/* --- 下載頁縮圖放大燈箱（ui-items.js 建立） --- */
-.ui-lightbox {
+/* --- 下載頁縮圖放大燈箱（download-items.js 建立） --- */
+.dl-lightbox {
     display: none;
     position: fixed;
     inset: 0;
@@ -1589,18 +1590,18 @@ body.manga-reading {
     background: rgba(0, 0, 0, 0.82);
 }
 
-.ui-lightbox.is-open {
+.dl-lightbox.is-open {
     display: flex;
 }
 
-.ui-lightbox img {
+.dl-lightbox img {
     max-width: 100%;
     max-height: 100%;
     border-radius: 8px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
 }
 
-.ui-lightbox-close {
+.dl-lightbox-close {
     position: absolute;
     top: 14px;
     right: 20px;
@@ -1612,6 +1613,6 @@ body.manga-reading {
     cursor: pointer;
 }
 
-.ui-card-media {
+.dl-card-media {
     cursor: zoom-in;
 }

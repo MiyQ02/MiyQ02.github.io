@@ -1,10 +1,10 @@
 /* ==========================================================
- * 滅Q 下載頁（ui-items.js）
+ * 滅Q 下載頁（download-items.js）
  * ----------------------------------------------------------
- * 由 ui.html / ui_mobile.html 以 <script src="ui-items.js" defer> 載入。
+ * 由 download.html / download_mobile.html 以 <script src="download-items.js" defer> 載入。
  *
  * 資源清單在本檔案上方維護，之後新增資源（桌布等）只需：
- *   1. 在 UI_ITEMS 追加一筆物件
+ *   1. 在 DL_ITEMS 追加一筆物件
  *   2. preview 放 ./img/download/ 下的展示圖
  *   3. links.win / links.linux 的下載網址由作者填入
  *      （目前為 '#' 佔位，點擊不會跳頁）
@@ -13,7 +13,7 @@
  * 搜尋會比對：三語名稱＋三語標籤＋分類名＋資源 id。
  * 點擊卡片縮圖可放大查看（簡化版燈箱）。
  * ========================================================== */
-window.UI_ITEMS = [
+window.DL_ITEMS = [
     {
         id: 'cursor-chito',
         category: 'cursor',
@@ -85,7 +85,7 @@ window.UI_ITEMS = [
 ];
 
 /* 探索列表的分類定義（顺序即列表顺序；全部＝不分類） */
-window.UI_CATEGORIES = [
+window.DL_CATEGORIES = [
     { id: 'cursor', name: { 'zh-TW': '游標', en: 'Cursors', ja: 'カーソル' } },
     { id: 'wallpaper', name: { 'zh-TW': '桌布', en: 'Wallpapers', ja: '壁紙' } }   // 預留：資源加入後自動出現
 ];
@@ -97,61 +97,61 @@ window.UI_CATEGORIES = [
 (function () {
     'use strict';
 
-    const UI_TEXT = {
+    const DL_TEXT = {
         'zh-TW': {
-            'ui-placeholder': '搜尋資源名稱或標籤…',
-            'ui-explore': '探索',
-            'ui-all': '全部',
-            'ui-count': '項',
-            'ui-empty-search': '找不到符合的資源',
-            'ui-empty-category': '這個分類還沒有資源，敬請期待',
-            'ui-win': 'Windows 下載',
-            'ui-linux': 'Linux 下載',
-            'ui-updated': '更新',
-            'ui-placeholder-link': '下載連結即將開放',
-            'ui-zoom': '點擊縮圖可放大查看',
-            'ui-close': '關閉'
+            'dl-placeholder': '搜尋資源名稱或標籤…',
+            'dl-explore': '探索',
+            'dl-all': '全部',
+            'dl-count': '項',
+            'dl-empty-search': '找不到符合的資源',
+            'dl-empty-category': '這個分類還沒有資源，敬請期待',
+            'dl-win': 'Windows 下載',
+            'dl-linux': 'Linux 下載',
+            'dl-updated': '更新',
+            'dl-placeholder-link': '下載連結即將開放',
+            'dl-zoom': '點擊縮圖可放大查看',
+            'dl-close': '關閉'
         },
         'en': {
-            'ui-placeholder': 'Search resources or tags…',
-            'ui-explore': 'Explore',
-            'ui-all': 'All',
-            'ui-count': 'items',
-            'ui-empty-search': 'No matching resources',
-            'ui-empty-category': 'Nothing in this category yet — stay tuned',
-            'ui-win': 'Download for Windows',
-            'ui-linux': 'Download for Linux',
-            'ui-updated': 'Updated',
-            'ui-placeholder-link': 'Download link coming soon',
-            'ui-zoom': 'Tap a thumbnail to zoom in',
-            'ui-close': 'Close'
+            'dl-placeholder': 'Search resources or tags…',
+            'dl-explore': 'Explore',
+            'dl-all': 'All',
+            'dl-count': 'items',
+            'dl-empty-search': 'No matching resources',
+            'dl-empty-category': 'Nothing in this category yet — stay tuned',
+            'dl-win': 'Download for Windows',
+            'dl-linux': 'Download for Linux',
+            'dl-updated': 'Updated',
+            'dl-placeholder-link': 'Download link coming soon',
+            'dl-zoom': 'Tap a thumbnail to zoom in',
+            'dl-close': 'Close'
         },
         'ja': {
-            'ui-placeholder': 'リソース名・タグを検索…',
-            'ui-explore': '探索',
-            'ui-all': 'すべて',
-            'ui-count': '件',
-            'ui-empty-search': '一致するリソースがありません',
-            'ui-empty-category': 'このカテゴリーはまだ準備中です',
-            'ui-win': 'Windows 版ダウンロード',
-            'ui-linux': 'Linux 版ダウンロード',
-            'ui-updated': '更新日',
-            'ui-placeholder-link': 'ダウンロードリンク準備中',
-            'ui-zoom': 'サムネイルをクリックで拡大',
-            'ui-close': '閉じる'
+            'dl-placeholder': 'リソース名・タグを検索…',
+            'dl-explore': '探索',
+            'dl-all': 'すべて',
+            'dl-count': '件',
+            'dl-empty-search': '一致するリソースがありません',
+            'dl-empty-category': 'このカテゴリーはまだ準備中です',
+            'dl-win': 'Windows 版ダウンロード',
+            'dl-linux': 'Linux 版ダウンロード',
+            'dl-updated': '更新日',
+            'dl-placeholder-link': 'ダウンロードリンク準備中',
+            'dl-zoom': 'サムネイルをクリックで拡大',
+            'dl-close': '閉じる'
         }
     };
 
-    let uiLang = 'zh-TW';
-    let uiQuery = '';
-    let uiCategory = 'all';
+    let dlLang = 'zh-TW';
+    let dlQuery = '';
+    let dlCategory = 'all';
 
     function normalize(text) {
         return String(text).toLowerCase().replace(/\s+/g, ' ').trim();
     }
 
     function t(key) {
-        return (UI_TEXT[uiLang] || UI_TEXT['zh-TW'])[key];
+        return (DL_TEXT[dlLang] || DL_TEXT['zh-TW'])[key];
     }
 
     function parseLabel(entry) {
@@ -164,7 +164,7 @@ window.UI_CATEGORIES = [
         ['zh-TW', 'en', 'ja'].forEach((lang) => {
             if (item.name[lang]) parts.push(item.name[lang]);
         });
-        window.UI_CATEGORIES.forEach((cat) => {
+        window.DL_CATEGORIES.forEach((cat) => {
             if (cat.id === item.category) {
                 ['zh-TW', 'en', 'ja'].forEach((lang) => parts.push(cat.name[lang]));
             }
@@ -178,19 +178,19 @@ window.UI_CATEGORIES = [
     }
 
     function categoryOf(id) {
-        return window.UI_CATEGORIES.find((cat) => cat.id === id) || { name: { 'zh-TW': id, en: id, ja: id } };
+        return window.DL_CATEGORIES.find((cat) => cat.id === id) || { name: { 'zh-TW': id, en: id, ja: id } };
     }
 
     function categoryName(id) {
         if (id === 'all') {
-            return t('ui-all');
+            return t('dl-all');
         }
         const cat = categoryOf(id);
-        return cat.name[uiLang] || cat.name['zh-TW'];
+        return cat.name[dlLang] || cat.name['zh-TW'];
     }
 
     function sortedItems() {
-        return window.UI_ITEMS.slice().sort((a, b) =>
+        return window.DL_ITEMS.slice().sort((a, b) =>
             String(b.updated).localeCompare(String(a.updated))
         );
     }
@@ -201,15 +201,15 @@ window.UI_CATEGORIES = [
     }
 
     function buildExploreMenu() {
-        const menu = document.getElementById('ui-explore-menu');
+        const menu = document.getElementById('dl-explore-menu');
         if (!menu) return;
         menu.innerHTML = '';
 
         const groups = [
-            { id: 'all', items: window.UI_ITEMS },
-            ...window.UI_CATEGORIES.map((cat) => ({
+            { id: 'all', items: window.DL_ITEMS },
+            ...window.DL_CATEGORIES.map((cat) => ({
                 id: cat.id,
-                items: window.UI_ITEMS.filter((item) => item.category === cat.id)
+                items: window.DL_ITEMS.filter((item) => item.category === cat.id)
             }))
         ];
 
@@ -219,21 +219,21 @@ window.UI_CATEGORIES = [
 
             const button = document.createElement('button');
             button.type = 'button';
-            button.className = 'ui-explore-item';
-            if (group.id === uiCategory) {
+            button.className = 'dl-explore-item';
+            if (group.id === dlCategory) {
                 button.classList.add('is-active');
             }
 
             const label = document.createElement('span');
-            label.className = 'ui-explore-name';
+            label.className = 'dl-explore-name';
             label.textContent = categoryName(group.id);
 
             const count = document.createElement('span');
-            count.className = 'ui-explore-count';
-            count.textContent = `${group.items.length} ${t('ui-count')}`;
+            count.className = 'dl-explore-count';
+            count.textContent = `${group.items.length} ${t('dl-count')}`;
 
             const date = document.createElement('time');
-            date.className = 'ui-explore-date';
+            date.className = 'dl-explore-date';
             date.dateTime = latestDate(group.items) || '';
             date.textContent = latestDate(group.items) || '—';
 
@@ -241,64 +241,64 @@ window.UI_CATEGORIES = [
             button.appendChild(count);
             button.appendChild(date);
             button.addEventListener('click', () => {
-                uiCategory = group.id;
-                document.getElementById('ui-explore')?.classList.remove('is-open');
-                renderUIPage();
+                dlCategory = group.id;
+                document.getElementById('dl-explore')?.classList.remove('is-open');
+                renderDlPage();
             });
             menu.appendChild(button);
         });
     }
 
     /* ---------------- 放大燈箱 ---------------- */
-    let uiLightbox = null;
+    let dlLightbox = null;
 
     function ensureLightbox() {
-        if (uiLightbox) return uiLightbox;
+        if (dlLightbox) return dlLightbox;
 
-        uiLightbox = document.createElement('div');
-        uiLightbox.className = 'ui-lightbox';
-        uiLightbox.setAttribute('role', 'dialog');
-        uiLightbox.setAttribute('aria-modal', 'true');
+        dlLightbox = document.createElement('div');
+        dlLightbox.className = 'dl-lightbox';
+        dlLightbox.setAttribute('role', 'dialog');
+        dlLightbox.setAttribute('aria-modal', 'true');
 
         const closeBtn = document.createElement('button');
         closeBtn.type = 'button';
-        closeBtn.className = 'ui-lightbox-close';
+        closeBtn.className = 'dl-lightbox-close';
         closeBtn.textContent = '×';
-        closeBtn.setAttribute('aria-label', t('ui-close'));
+        closeBtn.setAttribute('aria-label', t('dl-close'));
         closeBtn.addEventListener('click', closeLightbox);
 
         const img = document.createElement('img');
         img.alt = '';
 
-        uiLightbox.appendChild(closeBtn);
-        uiLightbox.appendChild(img);
-        uiLightbox.addEventListener('click', (event) => {
-            if (event.target === uiLightbox) closeLightbox();
+        dlLightbox.appendChild(closeBtn);
+        dlLightbox.appendChild(img);
+        dlLightbox.addEventListener('click', (event) => {
+            if (event.target === dlLightbox) closeLightbox();
         });
-        document.body.appendChild(uiLightbox);
-        return uiLightbox;
+        document.body.appendChild(dlLightbox);
+        return dlLightbox;
     }
 
     function openLightbox(src, alt) {
         const box = ensureLightbox();
         const img = box.querySelector('img');
-        const closeBtn = box.querySelector('.ui-lightbox-close');
+        const closeBtn = box.querySelector('.dl-lightbox-close');
         img.src = src;
         img.alt = alt;
-        closeBtn.setAttribute('aria-label', t('ui-close'));
+        closeBtn.setAttribute('aria-label', t('dl-close'));
         box.classList.add('is-open');
         document.body.style.overflow = 'hidden';
     }
 
     function closeLightbox() {
-        if (!uiLightbox) return;
-        uiLightbox.classList.remove('is-open');
-        uiLightbox.querySelector('img').removeAttribute('src');
+        if (!dlLightbox) return;
+        dlLightbox.classList.remove('is-open');
+        dlLightbox.querySelector('img').removeAttribute('src');
         document.body.style.overflow = '';
     }
 
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && uiLightbox?.classList.contains('is-open')) {
+        if (event.key === 'Escape' && dlLightbox?.classList.contains('is-open')) {
             closeLightbox();
         }
     });
@@ -306,57 +306,60 @@ window.UI_CATEGORIES = [
     /* ---------------- 卡片渲染 ---------------- */
     function createCard(item) {
         const card = document.createElement('article');
-        card.className = 'ui-card';
+        card.className = 'dl-card';
         card.dataset.id = item.id;
         card.dataset.search = itemCorpus(item);
 
         const media = document.createElement('div');
-        media.className = 'ui-card-media';
-        media.title = t('ui-zoom');
+        media.className = 'dl-card-media';
+        media.title = t('dl-zoom');
         const img = document.createElement('img');
         img.src = item.preview;
-        img.alt = item.name[uiLang] || item.name['zh-TW'];
+        img.alt = item.name[dlLang] || item.name['zh-TW'];
         img.loading = 'lazy';
         media.appendChild(img);
         media.addEventListener('click', () => openLightbox(item.preview, img.alt));
 
         const body = document.createElement('div');
-        body.className = 'ui-card-body';
+        body.className = 'dl-card-body';
 
         const head = document.createElement('div');
-        head.className = 'ui-card-head';
+        head.className = 'dl-card-head';
         const title = document.createElement('h3');
-        title.textContent = item.name[uiLang] || item.name['zh-TW'];
+        title.textContent = item.name[dlLang] || item.name['zh-TW'];
         const date = document.createElement('time');
         date.dateTime = item.updated;
-        date.textContent = `${t('ui-updated')} · ${item.updated}`;
+        date.textContent = `${t('dl-updated')} · ${item.updated}`;
         head.appendChild(title);
         head.appendChild(date);
 
         const desc = document.createElement('p');
-        desc.className = 'ui-card-desc';
-        desc.textContent = item.desc[uiLang] || item.desc['zh-TW'];
+        desc.className = 'dl-card-desc';
+        desc.textContent = item.desc[dlLang] || item.desc['zh-TW'];
 
         const tags = document.createElement('div');
         tags.className = 'work-tags';
+        const langKey = dlLang === 'zh-TW' ? 'zh' : dlLang;
         (item.tags || []).forEach((entry) => {
             const label = parseLabel(entry);
+            const text = label[langKey] || label.zh || label.en || label.ja;
+            if (!text) return;
             const chip = document.createElement('span');
-            chip.textContent = [label.zh, label.en, label.ja].filter(Boolean).join(' / ');
+            chip.textContent = text;
             tags.appendChild(chip);
         });
 
         const actions = document.createElement('div');
-        actions.className = 'ui-card-actions';
-        [['win', 'ui-win'], ['linux', 'ui-linux']].forEach(([key, textKey]) => {
+        actions.className = 'dl-card-actions';
+        [['win', 'dl-win'], ['linux', 'dl-linux']].forEach(([key, textKey]) => {
             const link = document.createElement('a');
-            link.className = 'ui-dl-btn';
+            link.className = 'dl-btn';
             link.textContent = t(textKey);
             const href = item.links[key];
             if (!href || href === '#') {
                 link.href = '#';
                 link.classList.add('is-placeholder');
-                link.title = t('ui-placeholder-link');
+                link.title = t('dl-placeholder-link');
                 link.addEventListener('click', (event) => event.preventDefault());
             } else {
                 link.href = href;
@@ -373,33 +376,33 @@ window.UI_CATEGORIES = [
         return card;
     }
 
-    function renderUIPage() {
-        const list = document.getElementById('ui-list');
+    function renderDlPage() {
+        const list = document.getElementById('dl-list');
         if (!list) return;
 
-        const searchInput = document.getElementById('ui-search-input');
+        const searchInput = document.getElementById('dl-search-input');
         if (searchInput) {
-            searchInput.placeholder = t('ui-placeholder');
+            searchInput.placeholder = t('dl-placeholder');
         }
-        const exploreBtn = document.querySelector('.ui-explore-btn-label');
+        const exploreBtn = document.querySelector('.dl-explore-btn-label');
         if (exploreBtn) {
-            exploreBtn.textContent = t('ui-explore');
+            exploreBtn.textContent = t('dl-explore');
         }
 
         const visible = sortedItems().filter((item) => {
-            if (uiCategory !== 'all' && item.category !== uiCategory) return false;
-            if (uiQuery && !itemCorpus(item).includes(uiQuery)) return false;
+            if (dlCategory !== 'all' && item.category !== dlCategory) return false;
+            if (dlQuery && !itemCorpus(item).includes(dlQuery)) return false;
             return true;
         });
 
         list.innerHTML = '';
         visible.forEach((item) => list.appendChild(createCard(item)));
 
-        const notice = document.getElementById('ui-notice');
+        const notice = document.getElementById('dl-notice');
         if (notice) {
             if (visible.length === 0) {
                 notice.hidden = false;
-                notice.textContent = uiQuery ? t('ui-empty-search') : t('ui-empty-category');
+                notice.textContent = dlQuery ? t('dl-empty-search') : t('dl-empty-category');
             } else {
                 notice.hidden = true;
             }
@@ -410,32 +413,32 @@ window.UI_CATEGORIES = [
 
     /* 供頁面全域語言切換呼叫（與 manga.html 的 updatePageLanguage 同規則） */
     window.updatePageLanguage = function (lang) {
-        uiLang = UI_TEXT[lang] ? lang : 'zh-TW';
+        dlLang = DL_TEXT[lang] ? lang : 'zh-TW';
 
-        const dict = window.UI_PAGE_I18N && window.UI_PAGE_I18N[uiLang];
+        const dict = window.DL_PAGE_I18N && window.DL_PAGE_I18N[dlLang];
         document.querySelectorAll('[data-i18n]').forEach((element) => {
             const key = element.getAttribute('data-i18n');
             if (dict && dict[key]) {
                 element.textContent = dict[key];
             }
         });
-        document.documentElement.lang = uiLang === 'ja' ? 'ja' : uiLang === 'en' ? 'en' : 'zh-TW';
+        document.documentElement.lang = dlLang === 'ja' ? 'ja' : dlLang === 'en' ? 'en' : 'zh-TW';
 
-        renderUIPage();
+        renderDlPage();
         document.documentElement.classList.remove('language-loading');
     };
 
     function init() {
-        const searchInput = document.getElementById('ui-search-input');
+        const searchInput = document.getElementById('dl-search-input');
         if (searchInput) {
             searchInput.addEventListener('input', () => {
-                uiQuery = normalize(searchInput.value);
-                renderUIPage();
+                dlQuery = normalize(searchInput.value);
+                renderDlPage();
             });
         }
 
-        const explore = document.getElementById('ui-explore');
-        const exploreBtn = explore?.querySelector('.ui-explore-btn');
+        const explore = document.getElementById('dl-explore');
+        const exploreBtn = explore?.querySelector('.dl-explore-btn');
         if (exploreBtn) {
             exploreBtn.addEventListener('click', () => {
                 explore.classList.toggle('is-open');
@@ -449,8 +452,8 @@ window.UI_CATEGORIES = [
 
         let saved = 'zh-TW';
         try { saved = localStorage.getItem('lang') || 'zh-TW'; } catch (error) {}
-        uiLang = UI_TEXT[saved] ? saved : 'zh-TW';
-        renderUIPage();
+        dlLang = DL_TEXT[saved] ? saved : 'zh-TW';
+        renderDlPage();
         document.documentElement.classList.remove('language-loading');
     }
 
