@@ -57,10 +57,10 @@ window.DL_ITEMS = [
         updated: '2026-03-07',
         preview: './img/download/cursor-shijima.jpg',
         thumb: './img/download/thumbs/cursor-shijima.jpg',
-        name: { 'zh-TW': '月島靜寂游標', en: 'Tsukishima Shizuka Desktop Cursor', ja: '月島しじま デスクトップカーソル' },
+        name: { 'zh-TW': '月島靜寂游標', en: 'Shijima Tsukishima Desktop Cursor', ja: '月島しじま デスクトップカーソル' },
         desc: {
             'zh-TW': '蘑菇的擬態日常 月島靜寂造型桌面游標，含白邊／無白邊兩種版本、17 種狀態、64×64 解析度。',
-            en: 'Tsukishima Shizuka (Shimeji Simulation) desktop cursor set: white / no-border variants, 17 states, 64×64.',
+            en: 'Shijima Tsukishima (Shimeji Simulation) desktop cursor set: white / no-border variants, 17 states, 64×64.',
             ja: 'シメジ シミュレーション月島しじまのデスクトップカーソル。白フチ／フチなしの2種、17状態、64×64。'
         },
         tags: ['蘑菇的擬態日常|Shimeji Simulation|シメジ シミュレーション', '月島靜寂|Tsukishima Shizuka|月島しじま', '游標|Cursor|カーソル'],
@@ -75,10 +75,10 @@ window.DL_ITEMS = [
         updated: '2026-04-11',
         preview: './img/download/cursor-majime.jpg',
         thumb: './img/download/thumbs/cursor-majime.jpg',
-        name: { 'zh-TW': '山下真面目游標', en: 'Yamashita Majime Desktop Cursor', ja: '山下まじめ デスクトップカーソル' },
+        name: { 'zh-TW': '山下真面目游標', en: 'Majime Yamashita Desktop Cursor', ja: '山下まじめ デスクトップカーソル' },
         desc: {
             'zh-TW': '蘑菇的擬態日常 山下真面目造型桌面游標，含白邊／無白邊兩種版本、17 種狀態、64×64 解析度。',
-            en: 'Yamashita Majime (Shimeji Simulation) desktop cursor set: white / no-border variants, 17 states, 64×64.',
+            en: 'Majime Yamashita (Shimeji Simulation) desktop cursor set: white / no-border variants, 17 states, 64×64.',
             ja: 'シメジ シミュレーション山下まじめのデスクトップカーソル。白フチ／フチなしの2種、17状態、64×64。'
         },
         tags: ['蘑菇的擬態日常|Shimeji Simulation|シメジ シミュレーション', '山下真面目|Yamashita Majime|山下まじめ', '游標|Cursor|カーソル'],
