@@ -329,55 +329,52 @@ function createWorks(start, end, year) {
 
 // 建立各年份作品資料。
 const works = [
-    ...createWorks(128, 139, 2026),
-    { filename: '128-2', year: '2026', extension: '.png' },
+    ...createWorks(131, 139, 2026),
     { filename: '130-2', year: '2026', extension: '.png' },
+    { filename: '130-1', year: '2026', extension: '.png' },
+    { filename: '129', year: '2026' },
+    { filename: '128-2', year: '2026', extension: '.png' },
+    { filename: '128-1', year: '2026', extension: '.png' },
 
     ...createWorks(100, 127, 2025),
 
-    ...createWorks(71, 99, 2024),
+    ...createWorks(80, 99, 2024),
     { filename: '79-2', year: '2024', extension: '.jpg' },
+    { filename: '79-1', year: '2024', extension: '.jpg' },
+    ...createWorks(71, 78, 2024),
 
     ...createWorks(18, 70, 2023),
     ...createWorks(1, 17, 2022)
 ];
 
 /*
- * 自然排序：檔名由大到小。
+ * 自然排序：主編號由大到小；同編號以後綴數字由大到小
+ * （-4 → -3 → -2 → -1），無後綴視為最小。
  *
  * 例如：
- * 139 → 138 → ... → 130 → 130-2 → 129
- * ... → 80 → 79 → 79-2 → 78 → ... → 1
+ * 139 → 138 → ... → 131 → 130-2 → 130-1 → 129
+ * ... → 128-2 → 128-1 → ... → 80 → 79-2 → 79-1 → 78 → ... → 1
  *
- * 第一層先比較檔名中的主數字；主數字相同時，再使用
- * localeCompare + numeric:true 比較完整檔名，確保排序規則
- * 不依賴電腦檔案的修改日期。
+ * 排序規則不依賴電腦檔案的修改日期。
  */
 function naturalDescendingCompare(a, b) {
-    const baseA = Number.parseInt(a.filename.split('-')[0], 10);
-    const baseB = Number.parseInt(b.filename.split('-')[0], 10);
+    const parseFilename = (filename) => {
+        const m = /^(\d+)(?:-(\d+))?$/.exec(filename);
+        return {
+            base: Number.parseInt(m[1], 10),
+            suffix: m[2] === undefined ? -1 : Number.parseInt(m[2], 10)
+        };
+    };
 
-    if (baseA !== baseB) {
-        return baseB - baseA;
+    const partA = parseFilename(a.filename);
+    const partB = parseFilename(b.filename);
+
+    if (partA.base !== partB.base) {
+        return partB.base - partA.base;
     }
 
-    // 同一主編號時：純數字作品排在差分/連作之後的需求，
-    // 例如 130 → 130-2、79 → 79-2。
-    const isPlainA = /^\d+$/.test(a.filename);
-    const isPlainB = /^\d+$/.test(b.filename);
-
-    if (isPlainA !== isPlainB) {
-        return isPlainA ? -1 : 1;
-    }
-
-    return b.filename.localeCompare(
-        a.filename,
-        undefined,
-        {
-            numeric: true,
-            sensitivity: 'base'
-        }
-    );
+    // 同主編號：後綴數字由大到小（-4 → -3 → -2 → -1），無後綴視為最小。
+    return partB.suffix - partA.suffix;
 }
 
 works.sort(naturalDescendingCompare);
@@ -442,26 +439,27 @@ const galleryWorkInfoData = {
             "title": "Portrait in Pastel",
             "description": "茂川老師和墨田學姊，兩位都有藝術細胞，天生一對（？）"
         },
-        "130": {
+        "130-2": {
             "title": "【02】Atonement of the Egoist",
             "description": "差分"
+        },
+        "130-1": {
+            "title": "Atonement of the Egoist",
+            "description": "那時候想到漫畫後半段的劇情，於是就畫了出來"
         },
         "129": {
             "title": "Shimeji Simulation",
             "description": "我很喜歡音遊的曲繪，於是就試著模仿"
         },
-        "128": {
+        "128-2": {
             "title": "【02】少女終末旅行電腦桌布",
             "description": "差分"
         },
-        "128-2": {
+        "128-1": {
             "title": "少女終末旅行電腦桌布",
             "description": "這是我目前畫的最滿意的一張圖，可以拿來當電腦桌布，並且在這當中使用了提供免費素材的網站的照片和我拍的照片，以及一些紋理"        
         },
-        "130-2": {
-            "title": "Atonement of the Egoist",
-            "description": "那時候想到漫畫後半段的劇情，於是就畫了出來"
-        },
+
         // ===== 2025 =====
         "127": {
             "title": "【22】筆記本塗鴉",
@@ -575,6 +573,7 @@ const galleryWorkInfoData = {
             "title": "【16】筆記本塗鴉",
             "description": "Ave Mujica動畫播出幾天後，就畫了這張圖"
         },
+
         // ===== 2024 =====
         "99": {
             "title": "Discord 群組繪畫OC交換活動",
@@ -656,9 +655,13 @@ const galleryWorkInfoData = {
             "title": "凱爾希拿魔爪",
             "description": "我記得這段時間很喜歡RaV²的畫，於是就模仿了他的風格一段時間，雖然不知道為什麼他把Pixiv上的圖都刪了，挺可惜的"
         },
-        "79": {
+        "79-2": {
             "title": "【02】腦子裡突然出現初音的樣子",
             "description": "重新上色"
+        },
+        "79-1": {
+            "title": "腦子裡突然出現初音的樣子",
+            "description": "我記得那時後很喜歡なお畫的圖"
         },
         "78": {
             "title": "生日快樂",
@@ -692,10 +695,7 @@ const galleryWorkInfoData = {
             "title": "【06】筆記本塗鴉",
             "description": "看了蘑菇的擬態日常而畫的圖，漫畫裡面的分鏡跟畫面我很喜歡"
         },
-        "79-2": {
-            "title": "腦子裡突然出現初音的樣子",
-            "description": "我記得那時後很喜歡なお畫的圖"
-        },
+
         // ===== 2023 =====
         "70": {
             "title": "【05】筆記本塗鴉",
@@ -909,7 +909,8 @@ const galleryWorkInfoData = {
             "title": "",
             "description": ""
         },
-        // ===== 2023 =====
+
+        // ===== 2022 =====
         "17": {
             "title": "",
             "description": ""
@@ -1017,26 +1018,27 @@ const galleryWorkInfoData = {
             "title": "Portrait in Pastel",
             "description": "Morikawa-sensei and Sumida-senpai. They both have an artistic side, so they make a perfect pair (?)."
         },
-        "130": {
+        "130-2": {
             "title": "【02】Atonement of the Egoist",
             "description": "A variation."
+        },
+        "130-1": {
+            "title": "Atonement of the Egoist",
+            "description": "I thought about the events in the latter half of the manga, so I drew this."
         },
         "129": {
             "title": "Shimeji Simulation",
             "description": "I really like rhythm-game illustrations, so I tried to imitate them."
         },
-        "128": {
+        "128-2": {
             "title": "【02】Girls’ Last Tour Desktop Wallpaper",
             "description": "A variation."
         },
-        "128-2": {
+        "128-1": {
             "title": "Girls’ Last Tour Desktop Wallpaper",
             "description": "This is the piece I’m most satisfied with so far. It can be used as a desktop wallpaper, and I used photos from a free stock-material website, photos I took myself, and some textures."
         },
-        "130-2": {
-            "title": "Atonement of the Egoist",
-            "description": "I thought about the events in the latter half of the manga, so I drew this."
-        },
+
         // ===== 2025 =====
         "127": {
             "title": "【22】Doodle",
@@ -1150,6 +1152,7 @@ const galleryWorkInfoData = {
             "title": "【16】Doodle",
             "description": "I drew this a few days after the Ave Mujica anime aired."
         },
+
         // ===== 2024 =====
         "99": {
             "title": "Discord Group Art OC Exchange",
@@ -1231,9 +1234,13 @@ const galleryWorkInfoData = {
             "title": "Kal’tsit with a Magic Claw",
             "description": "I remember really liking RaV²’s art around this time, so I imitated their style for a while. I don’t know why they deleted all their Pixiv works; it’s a shame."
         },
-        "79": {
+        "79-2": {
             "title": "【02】Hatsune Suddenly Popped into My Head",
             "description": "Recolored."
+        },
+        "79-1": {
+            "title": "Hatsune Suddenly Popped into My Head",
+            "description": "I remember really liking なお’s drawings at the time."
         },
         "78": {
             "title": "Happy birthday",
@@ -1267,10 +1274,7 @@ const galleryWorkInfoData = {
             "title": "【06】Doodle",
             "description": "Drew this after reading 'Shimeji Simulation'; I really like the paneling and scenes in the manga."
         },
-        "79-2": {
-            "title": "Hatsune Suddenly Popped into My Head",
-            "description": "I remember really liking なお’s drawings at the time."
-        },
+
         // ===== 2023 =====
         "70": {
             "title": "【05】Doodle",
@@ -1484,7 +1488,8 @@ const galleryWorkInfoData = {
             "title": "",
             "description": ""
         },
-        // ===== 2023 =====
+
+        // ===== 2022 =====
         "17": {
             "title": "",
             "description": ""
@@ -1592,26 +1597,27 @@ const galleryWorkInfoData = {
             "title": "Portrait in Pastel",
             "description": "もがわ先生とすみだ先輩。二人とも芸術的な才能があって、お似合いの二人（？）です。"
         },
-        "130": {
+        "130-2": {
             "title": "【02】Atonement of the Egoist",
             "description": "差分です。"
+        },
+        "130-1": {
+            "title": "Atonement of the Egoist",
+            "description": "漫画後半の展開を思い出して、描きました。"
         },
         "129": {
             "title": "Shimeji Simulation",
             "description": "音楽ゲームの曲イラストがとても好きなので、真似してみました。"
         },
-        "128": {
+        "128-2": {
             "title": "【02】少女終末旅行 デスクトップ壁紙",
             "description": "差分です。"
         },
-        "128-2": {
+        "128-1": {
             "title": "少女終末旅行 デスクトップ壁紙",
             "description": "今まで描いた中で一番気に入っている作品です。パソコンの壁紙に使えるようにしてあり、無料素材サイトの写真や自分で撮った写真、いくつかのテクスチャを使っています。"
         },
-        "130-2": {
-            "title": "Atonement of the Egoist",
-            "description": "漫画後半の展開を思い出して、描きました。"
-        },
+
         // ===== 2025 =====
         "127": {
             "title": "【22】落書きノート",
@@ -1725,6 +1731,7 @@ const galleryWorkInfoData = {
             "title": "【16】落書きノート",
             "description": "Ave Mujicaのアニメが放送されて数日後に、この絵を描きました。"
         },
+
         // ===== 2024 =====
         "99": {
             "title": "Discord Group Art OC Exchange",
@@ -1806,9 +1813,13 @@ const galleryWorkInfoData = {
             "title": "魔爪を持つケルシー",
             "description": "この頃はRaV²さんの絵がとても好きで、しばらくそのスタイルを真似していました。なぜPixivの絵を全部削除したのかは分かりませんが、残念です。"
         },
-        "79": {
+        "79-2": {
             "title": "【02】頭にふと初音ミクの姿が浮かんだ",
             "description": "塗り直し。"
+        },
+        "79-1": {
+            "title": "頭にふと初音ミクの姿が浮かんだ",
+            "description": "当時はなおさんの絵がとても好きだったのを覚えています。"
         },
         "78": {
             "title": "誕生日おめでとう",
@@ -1842,10 +1853,7 @@ const galleryWorkInfoData = {
             "title": "【06】落書きノート",
             "description": "『シメジシミュレーション』を見て描いた絵。漫画のコマ割りや画面の雰囲気がすごく好きなんだ"
         },
-        "79-2": {
-            "title": "頭にふと初音ミクの姿が浮かんだ",
-            "description": "当時はなおさんの絵がとても好きだったのを覚えています。"
-        },
+
         // ===== 2023 =====
         "70": {
             "title": "【05】落書きノート",
@@ -2059,7 +2067,8 @@ const galleryWorkInfoData = {
             "title": "",
             "description": ""
         },
-        // ===== 2023 =====
+
+        // ===== 2022 =====
         "17": {
             "title": "",
             "description": ""
