@@ -269,12 +269,15 @@ function mangaPageUrl(basePath, ext, page) {
     return `./img/manga/${basePath}/${page}.${ext}`;
 }
 
-/* 長篇作品封面：取第一個有頁面的章節的第 1 頁 */
+/* 長篇作品封面：取第一個有頁面的章節的第 1 頁（原圖＋縮圖並陳） */
 function mangaSeriesCover(lang, workId, chapters) {
     for (const chId of Object.keys(chapters)) {
         const ch = chapters[chId];
         if (ch.pages > 0) {
-            return mangaPageUrl(`long/${lang}/${workId}/${chId}`, ch.ext, 1);
+            return {
+                full: mangaPageUrl(`long/${lang}/${workId}/${chId}`, ch.ext, 1),
+                thumb: `./img/manga/long/${lang}/${workId}/${chId}/thumbs/1.${ch.ext}`
+            };
         }
     }
     return null;
@@ -306,10 +309,23 @@ function makeWorkCard() {
 }
 
 function renderShortWorks(grid, empty, lang) {
-    const works = (MANGA_LIBRARY.short && MANGA_LIBRARY.short[lang]) || [];
+    const library = MANGA_LIBRARY.short || {};
+    const works = library[lang] || [];
+
+    // 其他語言有、當前語言沒有的短篇：純文字「準備中」卡（比照長篇 pages:0 章節）
+    const fallback = [];
+    Object.keys(library).forEach((other) => {
+        if (other === lang) return;
+        (library[other] || []).forEach((work) => {
+            const dup = works.some((w) => w.id === work.id)
+                || fallback.some((w) => w.id === work.id);
+            if (!dup) fallback.push(work);
+        });
+    });
+
     grid.innerHTML = '';
 
-    if (!works.length) {
+    if (!works.length && !fallback.length) {
         empty.hidden = false;
         return;
     }
@@ -322,10 +338,12 @@ function renderShortWorks(grid, empty, lang) {
         title.textContent = work.title;
         count.textContent = `${work.pages} ${i18nData[lang]['manga-pages-unit']}`;
 
+        const fullSrc = mangaPageUrl(`short/${lang}/${work.id}`, work.ext, 1);
         const img = document.createElement('img');
-        img.src = mangaPageUrl(`short/${lang}/${work.id}`, work.ext, 1);
+        img.src = `./img/manga/short/${lang}/${work.id}/thumbs/1.${work.ext}`;
         img.alt = work.title;
         img.loading = 'lazy';
+        img.addEventListener('error', () => { img.src = fullSrc; }, { once: true });
         cover.appendChild(img);
 
         card.addEventListener('click', () => {
@@ -341,14 +359,45 @@ function renderShortWorks(grid, empty, lang) {
 
         grid.appendChild(card);
     });
+
+    fallback.forEach((work) => {
+        const { card, cover, title, count } = makeWorkCard();
+        card.classList.add('is-disabled');
+        card.setAttribute('aria-disabled', 'true');
+        title.textContent = work.title;
+        count.textContent = i18nData[lang]['manga-preparing'];
+        card.dataset.search = `${work.id}\n${work.title}`.toLowerCase();
+
+        const placeholder = document.createElement('span');
+        placeholder.className = 'manga-cover-placeholder';
+        placeholder.textContent = i18nData[lang]['manga-preparing'];
+        cover.appendChild(placeholder);
+
+        grid.appendChild(card);
+    });
 }
 
 function renderLongWorks(grid, empty, lang) {
-    const seriesMap = (MANGA_LIBRARY.long && MANGA_LIBRARY.long[lang]) || {};
+    const library = MANGA_LIBRARY.long || {};
+    const seriesMap = library[lang] || {};
     const workIds = Object.keys(seriesMap);
+
+    // 其他語言有、當前語言沒有的連載：純文字「準備中」卡＋可展開章節（章節原樣顯示、全不可點）
+    const fallbackIds = [];
+    const fallbackChapters = {};
+    Object.keys(library).forEach((other) => {
+        if (other === lang) return;
+        Object.keys(library[other] || {}).forEach((workId) => {
+            if (!seriesMap[workId] && !fallbackIds.includes(workId)) {
+                fallbackIds.push(workId);
+                fallbackChapters[workId] = library[other][workId];
+            }
+        });
+    });
+
     grid.innerHTML = '';
 
-    if (!workIds.length) {
+    if (!workIds.length && !fallbackIds.length) {
         empty.hidden = false;
         return;
     }
@@ -367,9 +416,10 @@ function renderLongWorks(grid, empty, lang) {
         const coverUrl = mangaSeriesCover(lang, workId, chapters);
         if (coverUrl) {
             const img = document.createElement('img');
-            img.src = coverUrl;
+            img.src = coverUrl.thumb;
             img.alt = workId;
             img.loading = 'lazy';
+            img.addEventListener('error', () => { img.src = coverUrl.full; }, { once: true });
             cover.appendChild(img);
         } else {
             const placeholder = document.createElement('span');
@@ -384,7 +434,6 @@ function renderLongWorks(grid, empty, lang) {
         panel.hidden = true;
 
         const panelTitle = document.createElement('h3');
-        panelTitle.className = 'manga-chapter-panel-title';
         panelTitle.textContent = `${workId} · ${i18nData[lang]['manga-chapters']}`;
         panel.appendChild(panelTitle);
 
@@ -426,6 +475,62 @@ function renderLongWorks(grid, empty, lang) {
                 });
             });
 
+            panel.appendChild(item);
+        });
+
+        card.addEventListener('click', () => {
+            const willOpen = panel.hidden;
+            panel.hidden = !willOpen;
+            card.classList.toggle('is-expanded', willOpen);
+
+            if (willOpen) {
+                panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+        });
+
+        grid.appendChild(card);
+        grid.appendChild(panel);
+    });
+    fallbackIds.forEach((workId) => {
+        const chapters = fallbackChapters[workId];
+        const chapterIds = Object.keys(chapters);
+
+        const { card, cover, title, count } = makeWorkCard();
+
+        title.textContent = workId;
+        count.textContent = `${chapterIds.length} ${i18nData[lang]['manga-chapters-unit']}`;
+        card.dataset.search = `${workId}\n${chapterIds.join('\n')}`.toLowerCase();
+
+        const placeholder = document.createElement('span');
+        placeholder.className = 'manga-cover-placeholder';
+        placeholder.textContent = i18nData[lang]['manga-preparing'];
+        cover.appendChild(placeholder);
+
+        const panel = document.createElement('div');
+        panel.className = 'manga-chapter-panel';
+        panel.hidden = true;
+
+        const panelTitle = document.createElement('h3');
+        panelTitle.className = 'manga-chapter-panel-title';
+        panelTitle.textContent = `${workId} · ${i18nData[lang]['manga-chapters']}`;
+        panel.appendChild(panelTitle);
+
+        chapterIds.forEach((chId) => {
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'manga-chapter-item is-disabled';
+            item.setAttribute('aria-disabled', 'true');
+
+            const name = document.createElement('span');
+            name.className = 'manga-chapter-name';
+            name.textContent = chId;
+
+            const pages = document.createElement('span');
+            pages.className = 'manga-chapter-pages';
+            pages.textContent = i18nData[lang]['manga-preparing'];
+
+            item.appendChild(name);
+            item.appendChild(pages);
             panel.appendChild(item);
         });
 

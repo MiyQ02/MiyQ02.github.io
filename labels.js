@@ -344,6 +344,13 @@ window.MIYQ_LABELS = {
                     matched: cards[index] || null
                 });
             });
+            // 他語言 fallback 的準備中卡（manga.html 產生，附 dataset.search）
+            for (let i = library.length; i < cards.length; i++) {
+                entries.push({
+                    search: (cards[i].dataset.search || '').toLowerCase(),
+                    matched: cards[i]
+                });
+            }
             filterCards(grid, entries);
         };
 
@@ -362,6 +369,13 @@ window.MIYQ_LABELS = {
                     matched: cards[index] || null
                 });
             });
+            // 他語言 fallback 的準備中卡（manga.html 產生，附 dataset.search）
+            for (let i = workIds.length; i < cards.length; i++) {
+                entries.push({
+                    search: (cards[i].dataset.search || '').toLowerCase(),
+                    matched: cards[i]
+                });
+            }
             filterCards(grid, entries);
         };
 
