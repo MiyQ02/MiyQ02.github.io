@@ -95,7 +95,7 @@
     (function () {
         try {
             var s = localStorage.getItem('cursor-set');
-            if (!(s && s !== 'default' && /^(Chito|Yuuri|Shijima|Majime)\/(no_border|white_border)$/.test(s))) {
+            if (!(s && s !== 'default' && /^(Chito|Yuuri|Shijima|Majime|Big_Sis)\/(no_border|white_border)$/.test(s))) {
                 return;
             }
             document.documentElement.setAttribute('data-cursor', s);

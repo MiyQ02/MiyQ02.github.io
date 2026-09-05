@@ -401,6 +401,7 @@ function createWorks(start, end, year) {
 // 建立各年份作品資料。
 const works = [
     ...createWorks(131, 139, 2026),
+    { filename: '140', year: '2026', extension: '.jpg' },
     { filename: '130-2', year: '2026', extension: '.png' },
     { filename: '130-1', year: '2026', extension: '.png' },
     { filename: '129', year: '2026' },
@@ -472,6 +473,10 @@ works.sort(naturalDescendingCompare);
 const galleryWorkInfoData = {
     "zh-TW": {
         // ===== 2026 =====
+        "140": {
+            "title": "【蘑菇的擬態日常】靜寂的姐姐游標",
+            "description": ""
+        },
         "139": {
             "title": "千都和尤莉的後室旅行",
             "description": "在後室中旅行，因為遇到怪物而逃跑"
@@ -1051,6 +1056,10 @@ const galleryWorkInfoData = {
     },
     "en": {
         // ===== 2026 =====
+        "140": {
+            "title": "【Shimeji Simulation】Big Sis Cursor",
+            "description": ""
+        },
         "139": {
             "title": "Chito and Yuuri Journey Through the Backrooms",
             "description": "Traveling through the Backrooms, they run away after encountering a monster."
@@ -1630,6 +1639,10 @@ const galleryWorkInfoData = {
     },
     "ja": {
         // ===== 2026 =====
+        "140": {
+            "title": "【シメジ シミュレーション】しじまの姉カーソル",
+            "description": ""
+        },
         "139": {
             "title": "チトとユーリのBackrooms旅行",
             "description": "Backroomsを旅していたところ、怪物に遭遇して逃げる二人。"

@@ -107,6 +107,20 @@
     --cur-text: url("page_cursor/Majime/white_border/Text.cur") 9 11, text;
     --cur-not-allowed: url("page_cursor/Majime/white_border/Unavailable.cur") 0 0, not-allowed;
 }
+
+:root[data-cursor="Big_Sis/no_border"] {
+    --cur-normal: url("page_cursor/Big_Sis/no_border/Normal.cur") 0 0, auto;
+    --cur-link: url("page_cursor/Big_Sis/no_border/Link.cur") 0 0, pointer;
+    --cur-text: url("page_cursor/Big_Sis/no_border/Text.cur") 9 11, text;
+    --cur-not-allowed: url("page_cursor/Big_Sis/no_border/Unavailable.cur") 0 0, not-allowed;
+}
+
+:root[data-cursor="Big_Sis/white_border"] {
+    --cur-normal: url("page_cursor/Big_Sis/white_border/Normal.cur") 0 0, auto;
+    --cur-link: url("page_cursor/Big_Sis/white_border/Link.cur") 0 0, pointer;
+    --cur-text: url("page_cursor/Big_Sis/white_border/Text.cur") 9 11, text;
+    --cur-not-allowed: url("page_cursor/Big_Sis/white_border/Unavailable.cur") 0 0, not-allowed;
+}
 /* ==========================================================================
    navbar 最左邊的游標設定圖示
    ========================================================================== */

@@ -15,6 +15,7 @@
 window.MIYQ_LABELS = {
     gallery: {
         // ===== 2026 =====
+        '140':   ['蘑菇的擬態日常|Shimeji Simulation|シメジ シミュレーション', '靜寂的姐姐|Big Sis|しじまの姉', '游標|Cursor|カーソル'],
         '139': ['少女終末旅行|Girls’ Last Tour|少女終末旅行', '千都|Chito|チト', '尤莉|Yuuri|ユーリ', '後室|Backrooms|バックルーム'],
         '138': ['NYN姉貴|NYN-neesan|NYN姉貴', '貼圖|Sticker|スタンプ'],
         '137': ['少女終末旅行|Girls’ Last Tour|少女終末旅行', '尤莉|Yuuri|ユーリ'],

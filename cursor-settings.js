@@ -45,12 +45,14 @@
         { id: 'Shijima/no_border',   role: 'Shijima', border: 'no_border' },
         { id: 'Shijima/white_border', role: 'Shijima', border: 'white_border' },
         { id: 'Majime/no_border',    role: 'Majime',  border: 'no_border' },
-        { id: 'Majime/white_border', role: 'Majime',  border: 'white_border' }
+        { id: 'Majime/white_border', role: 'Majime',  border: 'white_border' },
+        { id: 'Big_Sis/no_border',    role: 'Big_Sis',  border: 'no_border' },
+        { id: 'Big_Sis/white_border', role: 'Big_Sis',  border: 'white_border' },
     ];
     const CURSET_BASE_URL = 'page_cursor/';
 
     /* 依角色分組（左欄每個角色一列：無邊框 / 白邊框 並排） */
-    const ROLES = ['Chito', 'Yuuri', 'Shijima', 'Majime'];
+    const ROLES = ['Chito', 'Yuuri', 'Shijima', 'Majime', 'Big_Sis'];
 
     /* Cursor-Test 右欄：只列 page_cursor 實際存在的 17 種狀態。
        [檔名, 原生 fallback 關鍵字, hotspot]。標籤維持英文檔名。
@@ -98,7 +100,7 @@
             sizeHint: '僅套用於自訂游標集；恢復預設游標時不可調整。',
             sizeOptions: { default: '預設', small: '小', medium: '中', large: '大' },
             testEmpty: '請在左邊選擇一個游標',
-            roles: { Chito: '千都', Yuuri: '尤莉', Shijima: '靜寂', Majime: '真面目' },
+            roles: { Chito: '千都', Yuuri: '尤莉', Shijima: '靜寂', Majime: '真面目', Big_Sis: '靜寂的姐姐' },
             borders: { no_border: '無邊框', white_border: '白邊框' }
         },
         'en': {
@@ -112,7 +114,7 @@
             sizeHint: 'Applies to custom cursor sets only; disabled for the default cursor.',
             sizeOptions: { default: 'Default', small: 'Small', medium: 'Medium', large: 'Large' },
             testEmpty: 'Select a cursor on the left',
-            roles: { Chito: 'Chito', Yuuri: 'Yuuri', Shijima: 'Shijima', Majime: 'Majime' },
+            roles: { Chito: 'Chito', Yuuri: 'Yuuri', Shijima: 'Shijima', Majime: 'Majime', Big_Sis: 'Big Sis' },
             borders: { no_border: 'No border', white_border: 'White border' }
         },
         'ja': {
@@ -126,7 +128,7 @@
             sizeHint: 'カスタムカーソルのみに適用。既定のカーソルでは調整できません。',
             sizeOptions: { default: '既定', small: '小', medium: '中', large: '大' },
             testEmpty: '左側からカーソルを選択してください',
-            roles: { Chito: 'チト', Yuuri: 'ユーリ', Shijima: 'シジマ', Majime: 'マジメ' },
+            roles: { Chito: 'チト', Yuuri: 'ユーリ', Shijima: 'シジマ', Majime: 'マジメ', Big_Sis: 'しじまの姉' },
             borders: { no_border: '枠なし', white_border: '白枠' }
         }
     };
